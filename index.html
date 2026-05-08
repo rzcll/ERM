@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Klinik - eRM BPM</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #334155; } 
+        .bg-gradient-brand { background: linear-gradient(135deg, #0f766e 0%, #059669 100%); }
+        .table-header { background-color: #f1f5f9; color: #475569; }
+        
+        .table-container { overflow-x: auto; }
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .toast-enter { transform: translateY(-100%) scale(0.9); opacity: 0; }
+        .toast-enter-active { transform: translateY(0) scale(1); opacity: 1; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast-leave { transform: translateY(0) scale(1); opacity: 1; }
+        .toast-leave-active { transform: translateY(-100%) scale(0.9); opacity: 0; transition: all 0.3s ease-in; }
+
+        .modal-enter { opacity: 0; transform: scale(0.95) translateY(-10px); }
+        .modal-enter-active { opacity: 1; transform: scale(1) translateY(0); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-leave { opacity: 1; transform: scale(1) translateY(0); }
+        .modal-leave-active { opacity: 0; transform: scale(0.95) translateY(-10px); transition: all 0.2s ease-in; }
+        
+        /* Custom Input styling */
+        .form-input { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; width: 100%; transition: all 0.2s; background-color: #fff; }
+        .form-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
+    </style>
+</head>
+<body class="text-sm">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-container" class="fixed top-6 right-6 z-[300] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- MODAL AKSES PASSWORD -->
+    <div id="modalPassword" class="fixed inset-0 bg-slate-900/70 z-[250] hidden flex justify-center items-center backdrop-blur-sm">
+        <div id="modalPasswordContent" class="bg-white rounded-2xl shadow-2xl p-8 w-[350px] modal-enter border border-slate-100">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-rose-200">
+                    <i class="fas fa-lock text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">Akses Terkunci</h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">Masukkan password otorisasi untuk mengakses menu Laporan dan Pengaturan.</p>
+            </div>
+            <div class="mb-5 relative">
+                <i class="fas fa-key absolute left-3.5 top-3.5 text-slate-400"></i>
+                <input type="password" id="input_password_akses" class="form-input pl-10 text-center tracking-widest text-lg py-3 bg-slate-50 border-slate-300 focus:border-rose-400 focus:ring-rose-400 font-bold" placeholder="••••••••" onkeyup="if(event.key === 'Enter') verifikasiPassword()">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="batalPassword()" class="w-1/3 py-2.5 border border-slate-300 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors">Batal</button>
+                <button onclick="verifikasiPassword()" class="w-2/3 py-2.5 bg-rose-500 text-white rounded-xl font-bold hover:bg-rose-600 hover:shadow-lg hover:shadow-rose-500/30 transition-all flex justify-center items-center gap-2">
+                    Buka Akses <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BUAT BARU / EDIT PASIEN -->
+    <div id="modalBuatBaru" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-start pt-10 pb-10 overflow-y-auto">
+        <div id="modalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-4 modal-enter border border-slate-100">
+            <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3" id="titleModalPasien">
+                    <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>
+                    Pendaftaran Pasien Baru
+                </h2>
+                <button onclick="tutupFormBaru()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center focus:outline-none">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-8 bg-slate-50/50">
+                <form id="formPasienBaru" onsubmit="simpanDataBaru(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- KOLOM KIRI -->
+                        <div class="space-y-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Informasi Pribadi</h3>
+                            
+                            <div>
+                                <label class="form-label">No. eRM <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form_erm" required class="form-input bg-slate-50 font-mono text-teal-700 font-semibold" readonly>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form_nama" required placeholder="Masukkan nama sesuai KTP" class="form-input uppercase">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="form-label">Status KK</label>
+                                    <select id="form_status_kk" class="form-input cursor-pointer">
+                                        <option value="">- Pilih -</option>
+                                        <option value="Kepala Keluarga">Kepala Keluarga</option>
+                                        <option value="Istri">Istri</option>
+                                        <option value="Anak">Anak</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                                    <div class="flex items-center space-x-4 h-[38px]">
+                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Laki-laki" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Laki-laki</label>
+                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Perempuan" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Perempuan</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KOLOM KANAN -->
+                        <div class="space-y-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Detail Kelahiran & Domisili</h3>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="form-label">Tempat Lahir</label>
+                                    <input type="text" id="form_tempat_lahir" placeholder="Kota Kelahiran" class="form-input uppercase">
+                                </div>
+                                <div>
+                                    <label class="form-label">Tanggal Lahir</label>
+                                    <div class="grid grid-cols-3 gap-1">
+                                        <select id="form_tgl_hari" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                            <option value="">Hari</option>
+                                        </select>
+                                        <select id="form_tgl_bulan" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                            <option value="">Bln</option>
+                                            <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+                                            <option value="04">Apr</option><option value="05">Mei</option><option value="06">Jun</option>
+                                            <option value="07">Jul</option><option value="08">Agu</option><option value="09">Sep</option>
+                                            <option value="10">Okt</option><option value="11">Nov</option><option value="12">Des</option>
+                                        </select>
+                                        <select id="form_tgl_tahun" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                            <option value="">Thn</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Usia Pasien</label>
+                                <div class="flex border border-slate-200 rounded-lg overflow-hidden bg-slate-50 shadow-inner">
+                                    <input type="number" id="umur_thn" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Tahun</div>
+                                    <input type="number" id="umur_bln" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Bulan</div>
+                                    <input type="number" id="umur_hr" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-l border-slate-200 font-medium">Hari</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Kelurahan / Desa</label>
+                                <input type="text" id="form_kelurahan" placeholder="Nama Kelurahan / Desa" class="form-input uppercase">
+                            </div>
+
+                            <div>
+                                <label class="form-label">Alamat Lengkap</label>
+                                <textarea id="form_alamat" rows="2" placeholder="Jalan, Dusun, Perumahan" class="form-input resize-y mb-3"></textarea>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <label class="font-semibold text-slate-500 text-xs w-8">RT</label>
+                                        <input type="text" id="form_rt" placeholder="000" class="form-input py-1.5">
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <label class="font-semibold text-slate-500 text-xs w-8">RW</label>
+                                        <input type="text" id="form_rw" placeholder="000" class="form-input py-1.5">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
+                        <button type="button" onclick="tutupFormBaru()" class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 font-semibold transition-all">
+                            Batalkan
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-brand text-white hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 font-semibold transition-all flex items-center gap-2">
+                            <i class="fas fa-save"></i> Simpan Pasien
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RIWAYAT PASIEN -->
+    <div id="modalRiwayat" class="fixed inset-0 bg-slate-900/60 z-[160] hidden flex justify-center items-start pt-10 pb-10 overflow-y-auto backdrop-blur-sm">
+        <div id="modalRiwayatContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 modal-enter border border-slate-100">
+            <div class="px-8 py-5 border-b border-indigo-100 flex justify-between items-center bg-indigo-50/50 rounded-t-2xl">
+                <h2 class="text-xl font-bold text-indigo-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fas fa-history"></i></div>
+                    Riwayat Rekam Medis
+                </h2>
+                <button onclick="tutupRiwayat()" class="w-8 h-8 rounded-full hover:bg-indigo-100 text-indigo-400 hover:text-indigo-600 transition-colors flex items-center justify-center focus:outline-none">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-8">
+                <div class="flex justify-between mb-6 items-center bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Nama Pasien</span>
+                        <span id="riwayatNama" class="font-bold text-slate-800 uppercase text-lg"></span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">No. eRM</span>
+                        <span id="riwayatErm" class="font-mono text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100"></span>
+                    </div>
+                </div>
+                <div class="table-container max-h-[400px] overflow-y-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-indigo-50 text-indigo-700 text-xs uppercase font-bold sticky top-0 shadow-sm">
+                            <tr>
+                                <th class="p-4 border-b border-indigo-100">Tgl Kunjungan</th>
+                                <th class="p-4 border-b border-indigo-100">Keluhan</th>
+                                <th class="p-4 border-b border-indigo-100">Vital Sign</th>
+                                <th class="p-4 border-b border-indigo-100">Diagnosa/Resep</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableRiwayatList" class="text-sm text-slate-600 divide-y divide-slate-100">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI PELAYANAN -->
+    <div id="modalKonfirmasi" class="fixed inset-0 bg-slate-900/60 z-[130] hidden flex justify-center items-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-[400px] max-w-full modal-enter text-center border border-slate-100" id="modalKonfirmasiContent">
+            <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-blue-50 mb-6 border-8 border-white shadow-md relative -top-12">
+                <i class="fas fa-stethoscope text-4xl text-blue-500"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2 -mt-8">Kirim ke Antrean</h3>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="teksKonfirmasi"></p>
+            <div class="flex justify-center gap-3 w-full">
+                <button onclick="tutupKonfirmasi()" class="px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2">Batalkan</button>
+                <button onclick="prosesPelayanan()" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition w-1/2">Ya, Proses</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM PELAYANAN MEDIS -->
+    <div id="modalPelayanan" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-start pt-8 pb-8 overflow-y-auto backdrop-blur-sm">
+        <div id="modalPelayananContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-4 modal-enter border border-slate-100">
+            <div class="px-8 py-5 border-b border-blue-100 flex justify-between items-center bg-blue-50/50 rounded-t-2xl">
+                <h2 class="text-xl font-bold text-blue-800 flex items-center gap-3" id="titleModalPemeriksaan">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fas fa-stethoscope"></i></div>
+                    Rekam Medis Elektronik
+                </h2>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="bukaRiwayatDariPelayanan()" class="text-indigo-600 border border-indigo-200 bg-white hover:bg-indigo-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
+                        <i class="fas fa-history mr-2"></i> Histori Pasien
+                    </button>
+                    <button onclick="tutupFormPelayanan()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-8">
+                <div class="bg-gradient-to-r from-slate-50 to-white p-5 rounded-xl border border-slate-200 mb-8 flex justify-between items-center shadow-sm">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pasien Saat Ini</p>
+                        <p class="text-xl font-extrabold text-slate-800 uppercase" id="info_nama_pelayanan">-</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">No. eRM</p>
+                        <p class="text-base font-mono font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block" id="info_erm_pelayanan">-</p>
+                    </div>
+                </div>
+
+                <form id="formDataPelayanan" onsubmit="simpanDataPelayanan(event)">
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <label class="form-label text-base mb-3"><i class="fas fa-comment-medical text-blue-500 mr-2"></i>Keluhan Utama Pasien <span class="text-rose-500">*</span></label>
+                            <textarea id="pel_keluhan" required rows="2" placeholder="Anamnesa / Keluhan saat datang..." class="form-input text-base"></textarea>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <label class="form-label text-base border-b border-slate-100 pb-3 mb-4"><i class="fas fa-heartbeat text-rose-500 mr-2"></i>Tanda-Tanda Vital (TTV)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">TD (mmHg)</label><input type="text" id="pel_td" class="form-input bg-slate-50" placeholder="120/80"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Nadi (x/m)</label><input type="number" id="pel_nadi" class="form-input bg-slate-50" placeholder="80"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Nafas (x/m)</label><input type="number" id="pel_nafas" class="form-input bg-slate-50" placeholder="20"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Suhu (°C)</label><input type="number" step="0.1" id="pel_suhu" class="form-input bg-slate-50" placeholder="36.5"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">SpO2 (%)</label><input type="number" id="pel_spo2" class="form-input bg-slate-50" placeholder="98"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">TB (cm)</label><input type="number" id="pel_tb" class="form-input bg-slate-50" placeholder="160"></div>
+                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">BB (kg)</label><input type="number" step="0.1" id="pel_bb" class="form-input bg-slate-50" placeholder="60.5"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-base mb-3"><i class="fas fa-vial text-purple-500 mr-2"></i>Pemeriksaan Penunjang / Lab</label>
+                                <textarea id="pel_laborat" rows="4" class="form-input bg-slate-50" placeholder="Hasil GDA, AU, Kolesterol..."></textarea>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-base mb-3"><i class="fas fa-pills text-teal-500 mr-2"></i>Diagnosa & Resep Obat <span class="text-rose-500">*</span></label>
+                                <textarea id="pel_resep" required rows="4" class="form-input font-mono bg-yellow-50 border-yellow-200" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
+                        <button type="button" onclick="tutupFormPelayanan()" class="px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">Simpan Draft / Batal</button>
+                        <button type="submit" class="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 transition flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Selesai & Kirim ke Kasir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM KASIR -->
+    <div id="modalKasir" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-center backdrop-blur-sm">
+        <div id="modalKasirContent" class="bg-white rounded-2xl shadow-2xl p-8 w-[450px] modal-enter border border-slate-100">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500"><i class="fas fa-cash-register text-lg"></i></div>
+                <h3 class="text-xl font-bold text-slate-800">Pembayaran Kasir</h3>
+            </div>
+            
+            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tagihan Untuk:</p>
+                <p class="font-extrabold text-slate-800 text-lg uppercase" id="info_nama_kasir">-</p>
+                <p class="text-sm font-mono text-orange-600 font-bold mb-4" id="info_erm_kasir">-</p>
+                
+                <div class="pt-4 border-t border-slate-200">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Resep / Tindakan:</p>
+                    <div id="info_resep_kasir" class="bg-white border border-slate-200 rounded-lg p-3 text-sm text-slate-700 font-mono min-h-[60px] whitespace-pre-wrap shadow-inner"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 mb-8">
+                <label class="text-sm font-bold text-slate-700">Total Nominal Tagihan (Rp):</label>
+                <input type="number" id="input_tagihan_kasir" placeholder="0" class="form-input text-right font-extrabold text-orange-600 text-2xl py-3 border-orange-300 focus:border-orange-500 focus:ring-orange-500 shadow-inner">
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="tutupFormKasir()" class="px-5 py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition w-1/3">Tutup</button>
+                <button id="btnSimpanKasir" onclick="simpanDataKasir()" class="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/30 transition flex-1 flex justify-center items-center gap-2">
+                    <i class="fas fa-check-circle"></i> Selesaikan
+                </button>
+                <button id="btnCetakStruk" onclick="cetakStrukKasir()" class="hidden px-5 py-2.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition flex-1 justify-center items-center gap-2">
+                    <i class="fas fa-print"></i> Cetak Struk
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVBAR PREMIUM -->
+    <nav class="bg-gradient-brand text-white shadow-lg sticky top-0 z-50 border-b border-teal-800/50">
+        <div class="max-w-[1600px] mx-auto flex justify-between items-center px-6">
+            <div class="flex items-center py-3">
+                <!-- LOGO -->
+                <div class="pr-8 border-r border-teal-600/50 cursor-pointer flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-sm">
+                        <i class="fas fa-hospital-user text-xl text-teal-100"></i>
+                    </div>
+                    <div>
+                        <div class="text-xl font-extrabold tracking-tight leading-none">eRM<span class="font-light text-teal-100">BPM</span></div>
+                        <div class="text-[10px] text-teal-200 font-semibold tracking-widest uppercase mt-0.5">Sistem Klinik</div>
+                    </div>
+                </div>
+                
+                <!-- MENU NAVIGATION -->
+                <ul class="flex font-semibold text-[13px] ml-6 gap-2">
+                    <!-- Pendaftaran -->
+                    <li>
+                        <button onclick="switchView('pendaftaran')" class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2.5">
+                            <i class="fas fa-address-card text-teal-200 opacity-90 text-base"></i> <span>Pendaftaran</span>
+                        </button>
+                    </li>
+                    
+                    <!-- Pelayanan Dropdown -->
+                    <li class="relative group">
+                        <button class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2.5 focus:outline-none">
+                            <i class="fas fa-stethoscope text-teal-200 opacity-90 text-base"></i> <span>Pelayanan</span>
+                            <span id="badgePelayanan" class="hidden bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full shadow-sm ml-1 transform scale-90">0</span> 
+                            <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
+                        </button>
+                        
+                        <div class="absolute left-0 top-[100%] pt-2 w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                            <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
+                                <li onclick="switchView('pelayanan_medis')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
+                                    <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-blue-600 transition-colors">
+                                        <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-user-md text-base"></i></div>
+                                        <div>Poli Medis <div class="text-[10px] text-slate-400 font-medium leading-tight">Antrean pemeriksaan</div></div>
+                                    </span>
+                                    <span id="badgeDropdownMedis" class="hidden bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
+                                </li>
+                                <li onclick="switchView('pelayanan_kasir')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
+                                    <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-orange-600 transition-colors">
+                                        <div class="w-9 h-9 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover/item:bg-orange-500 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-cash-register text-base"></i></div>
+                                        <div>Kasir Klinik <div class="text-[10px] text-slate-400 font-medium leading-tight">Pembayaran & Struk</div></div>
+                                    </span>
+                                    <span id="badgeDropdownKasir" class="hidden bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    
+                    <!-- Laporan Dropdown -->
+                    <li class="relative group">
+                        <button class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2.5 focus:outline-none">
+                            <i class="fas fa-chart-pie text-teal-200 opacity-90 text-base"></i> <span>Laporan</span>
+                            <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
+                        </button>
+                        
+                        <div class="absolute left-0 top-[100%] pt-2 w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                            <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
+                                <li onclick="switchView('laporan_kunjungan')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                    <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover/item:bg-teal-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-users text-base"></i></div>
+                                    <div><span class="font-bold text-slate-700 group-hover/item:text-teal-700 transition-colors">Kunjungan Pasien</span><div class="text-[10px] text-slate-400 font-medium leading-tight">Histori pendaftaran</div></div>
+                                </li>
+                                <li onclick="switchView('laporan_keuangan')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                    <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-file-invoice-dollar text-base"></i></div>
+                                    <div><span class="font-bold text-slate-700 group-hover/item:text-emerald-700 transition-colors">Pendapatan Klinik</span><div class="text-[10px] text-slate-400 font-medium leading-tight">Laporan keuangan</div></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Pengaturan -->
+                    <li>
+                        <button onclick="switchView('pengaturan')" class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2.5">
+                            <i class="fas fa-cog text-teal-200 opacity-90 text-base"></i> <span>Pengaturan</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors border border-white/20 shadow-inner"><i class="fas fa-bell text-sm"></i></div>
+                <div class="flex items-center gap-2 bg-slate-900/30 px-3 py-1.5 rounded-full text-xs font-semibold shadow-inner border border-slate-900/20">
+                    <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span></span>
+                    Online Server
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="p-6 max-w-[1600px] mx-auto z-10">
+        
+        <!-- ================= VIEW PENDAFTARAN ================= -->
+        <div id="view-pendaftaran" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden block transition-all duration-300">
+            <div class="px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-slate-100 bg-slate-50/50">
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-users"></i></div>
+                    Master Data Pasien
+                </h1>
+                <div class="flex gap-3 w-full md:w-auto">
+                    <div class="relative flex-1 md:w-64">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" onkeyup="renderTabel(patientsData)" placeholder="Cari Nama / No. eRM..." class="pl-9 pr-3 py-2 w-full border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-white shadow-sm">
+                    </div>
+                    <button onclick="fetchDataDariSpreadsheet()" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 transition shadow-sm"><i class="fas fa-sync-alt"></i></button>
+                    <button onclick="bukaFormBaru()" class="bg-gradient-brand text-white px-5 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Pasien Baru
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container p-2 min-h-[500px]">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 rounded-lg">
+                        <tr>
+                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
+                            <th class="p-4 text-center w-[140px]">Tindakan</th>
+                            <th class="p-4">No. eRM</th>
+                            <th class="p-4">Nama Lengkap</th>
+                            <th class="p-4">L/P</th>
+                            <th class="p-4">Usia / TTL</th>
+                            <th class="p-4 rounded-tr-lg">Alamat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= VIEW PELAYANAN MEDIS ================= -->
+        <div id="view-pelayanan-medis" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
+            <div class="bg-blue-50 border-b border-blue-100 px-6 py-5 flex justify-between items-center">
+                <h1 class="text-xl font-bold text-blue-800 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white text-blue-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-user-md"></i></div>
+                    Antrean Poli Medis
+                </h1>
+                <div class="flex items-center gap-3 bg-white p-1.5 rounded-lg border border-blue-200 shadow-sm">
+                    <label class="text-xs font-bold text-blue-800 px-3 uppercase tracking-wider"><i class="far fa-calendar-alt mr-1"></i> Tanggal:</label>
+                    <input type="date" id="filter_tgl_medis" onchange="renderTabelPelayananMedis()" class="form-input py-1.5 px-2 text-sm font-semibold text-blue-700 border-none focus:ring-0 cursor-pointer w-auto bg-blue-50/30 rounded-md">
+                </div>
+            </div>
+            <div class="table-container p-2 min-h-[400px]">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+                        <tr>
+                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
+                            <th class="p-4">No. eRM</th>
+                            <th class="p-4">Nama Pasien</th>
+                            <th class="p-4">Waktu Daftar</th>
+                            <th class="p-4 rounded-tr-lg text-center w-48">Pemeriksaan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyPelayananMedis" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= VIEW PELAYANAN KASIR ================= -->
+        <div id="view-pelayanan-kasir" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
+            <div class="bg-orange-50 border-b border-orange-100 px-6 py-5 flex justify-between items-center">
+                <h1 class="text-xl font-bold text-orange-800 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white text-orange-500 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-calculator"></i></div>
+                    Antrean Kasir
+                </h1>
+            </div>
+            <div class="table-container p-2 min-h-[400px]">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+                        <tr>
+                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
+                            <th class="p-4">No. eRM</th>
+                            <th class="p-4">Nama Pasien</th>
+                            <th class="p-4">Waktu Medis</th>
+                            <th class="p-4 rounded-tr-lg text-center w-48">Pembayaran</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyPelayananKasir" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= VIEW LAPORAN ================= -->
+        <div id="view-laporan-kunjungan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
+            <div class="bg-teal-50 border-b border-teal-100 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <h1 class="text-xl font-bold text-teal-800 flex items-center gap-3"><div class="w-10 h-10 bg-white text-teal-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-users"></i></div>Laporan Kunjungan</h1>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <select id="filter_waktu_kunjungan" onchange="toggleCustomDate('kunjungan'); renderLaporanKunjungan()" class="form-input w-auto font-semibold text-teal-700 bg-white border-teal-200 shadow-sm">
+                        <option value="hari_ini">Hari Ini</option>
+                        <option value="minggu_ini">Minggu Ini</option>
+                        <option value="bulan_ini">Bulan Ini</option>
+                        <option value="semua">Semua Waktu</option>
+                        <option value="rentang">Rentang Waktu</option>
+                    </select>
+                    <div id="custom_date_kunjungan" class="hidden flex items-center gap-2 bg-white border border-teal-200 p-1 rounded-lg shadow-sm">
+                        <label class="text-xs font-bold text-slate-500 pl-2">Mulai:</label>
+                        <input type="date" id="kunjungan_start" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
+                        <label class="text-xs font-bold text-slate-500 border-l border-teal-100 pl-2">Sampai:</label>
+                        <input type="date" id="kunjungan_end" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
+                    </div>
+                    <button onclick="downloadLaporan('kunjungan')" class="bg-teal-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-teal-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
+                </div>
+            </div>
+            <div class="table-container p-2 min-h-[400px]">
+                <table class="w-full text-left whitespace-nowrap"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-4 text-center w-12">#</th><th class="p-4">Waktu</th><th class="p-4">eRM</th><th class="p-4">Pasien</th><th class="p-4">L/P</th><th class="p-4">Alamat</th><th class="p-4">Status</th></tr></thead><tbody id="tableBodyLaporanKunjungan" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody></table>
+            </div>
+        </div>
+
+        <div id="view-laporan-keuangan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
+            <div class="bg-emerald-50 border-b border-emerald-100 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <h1 class="text-xl font-bold text-emerald-800 flex items-center gap-3"><div class="w-10 h-10 bg-white text-emerald-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Laporan Pendapatan</h1>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <select id="filter_waktu_keuangan" onchange="toggleCustomDate('keuangan'); renderLaporanKeuangan()" class="form-input w-auto font-semibold text-emerald-700 bg-white border-emerald-200 shadow-sm">
+                        <option value="hari_ini">Hari Ini</option>
+                        <option value="minggu_ini">Minggu Ini</option>
+                        <option value="bulan_ini">Bulan Ini</option>
+                        <option value="semua">Semua Waktu</option>
+                        <option value="rentang">Rentang Waktu</option>
+                    </select>
+                    <div id="custom_date_keuangan" class="hidden flex items-center gap-2 bg-white border border-emerald-200 p-1 rounded-lg shadow-sm">
+                        <label class="text-xs font-bold text-slate-500 pl-2">Mulai:</label>
+                        <input type="date" id="keuangan_start" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
+                        <label class="text-xs font-bold text-slate-500 border-l border-emerald-100 pl-2">Sampai:</label>
+                        <input type="date" id="keuangan_end" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
+                    </div>
+                    <button onclick="downloadLaporan('keuangan')" class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
+                </div>
+            </div>
+            <div class="table-container p-2 min-h-[400px]">
+                <table class="w-full text-left whitespace-nowrap"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-4 text-center w-12">#</th><th class="p-4">Waktu Lunas</th><th class="p-4">eRM</th><th class="p-4">Pasien</th><th class="p-4 text-right">Nominal (Rp)</th></tr></thead><tbody id="tableBodyLaporanKeuangan" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody><tfoot id="tfootLaporanKeuangan" class="bg-emerald-50 font-bold text-emerald-800 text-base"></tfoot></table>
+            </div>
+        </div>
+
+        <!-- ================= VIEW PENGATURAN ================= -->
+        <div id="view-pengaturan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
+            <div class="bg-slate-50 border-b border-slate-200 px-6 py-5 flex justify-between items-center">
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white text-slate-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-cog"></i></div>
+                    Pengaturan Sistem
+                </h1>
+                <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2"><i class="fas fa-lock"></i> Kunci Akses</button>
+            </div>
+            
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- PENGATURAN STRUK -->
+                <div class="border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-print text-blue-500 mr-2"></i> Pengaturan Struk Kasir</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="form-label">Nama / Kop Klinik</label>
+                            <input type="text" id="set_struk_kop" class="form-input font-bold text-slate-800" value="eRM BPM CLINIC">
+                        </div>
+                        <div>
+                            <label class="form-label">Alamat / Baris 2 Kop</label>
+                            <input type="text" id="set_struk_alamat" class="form-input text-slate-600" value="Struk Resmi">
+                        </div>
+                        <div>
+                            <label class="form-label">Pesan Bawah (Footer)</label>
+                            <textarea id="set_struk_footer" rows="2" class="form-input text-slate-600">Terima Kasih, Semoga Lekas Sembuh</textarea>
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">Simpan Template Struk</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PENGATURAN PASSWORD -->
+                <div class="border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-shield-alt text-rose-500 mr-2"></i> Pengaturan Keamanan</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-rose-50 p-4 rounded-xl border border-rose-100 mb-4">
+                            <p class="text-xs text-rose-700 font-medium">Password ini digunakan untuk mengunci akses ke menu Laporan dan Pengaturan agar tidak bisa diubah oleh sembarang orang. <br><br><b>Password bawaan: admin</b></p>
+                        </div>
+                        <div>
+                            <label class="form-label">Password Baru</label>
+                            <input type="password" id="set_pass_baru" class="form-input tracking-widest font-bold text-center" placeholder="••••••••">
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="simpanPengaturanPassword()" class="w-full py-2.5 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 shadow-md transition-all">Ganti Password Akses</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Sistem Konfigurasi & Backend URL ---
+        // GANTI STRING DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk8GYYPdYmf7_BwWHfTrQE6ASv4Kd3KJzUY2CPe7VyW7l7vnBQijO0DzFgOUkibcdmzQ/exec';
+
+        // --- Sistem API Fetch (Untuk GitHub / Mode Mandiri) ---
+        async function apiCall(action, payload = null) {
+            if (!SCRIPT_URL || SCRIPT_URL === 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                console.warn("SCRIPT_URL belum diatur. Menggunakan Mode Lokal.");
+                return null;
+            }
+            try {
+                let res;
+                if (payload) {
+                    res = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: action, data: payload }),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    });
+                } else {
+                    res = await fetch(`${SCRIPT_URL}?action=${action}`);
+                }
+                const result = await res.json();
+                if (result.status === 'success') {
+                    return result.data;
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // --- Sistem Toast Notifikasi ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass, iconClass;
+            switch(type) {
+                case 'success': bgClass = 'bg-teal-600'; iconClass = 'fa-check-circle text-teal-200'; break;
+                case 'warning': bgClass = 'bg-orange-500'; iconClass = 'fa-exclamation-triangle text-orange-200'; break;
+                case 'error': bgClass = 'bg-rose-600'; iconClass = 'fa-times-circle text-rose-200'; break;
+                default: bgClass = 'bg-slate-800'; iconClass = 'fa-info-circle text-slate-300';
+            }
+
+            toast.className = `${bgClass} text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 toast-enter text-sm font-semibold border border-white/10`;
+            toast.innerHTML = `<i class="fas ${iconClass} text-lg"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => { toast.classList.remove('toast-enter'); toast.classList.add('toast-enter-active'); });
+            setTimeout(() => { toast.classList.remove('toast-enter-active'); toast.classList.add('toast-leave-active'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        // --- State ---
+        let patientsData = []; 
+        let pelayananData = []; 
+        let riwayatMedisGlobal = []; 
+        let editPasienIndex = -1;
+
+        // --- Konfigurasi Sistem ---
+        let appConfig = {
+            passwordAkses: 'admin',
+            strukKop: 'eRM BPM CLINIC',
+            strukAlamat: 'Struk Resmi',
+            strukFooter: 'Terima Kasih, Semoga Lekas Sembuh'
+        };
+        let isOtorisasiValid = false;
+        let pendingView = '';
+
+        // --- Logika Akses / Pindah View ---
+        function switchView(view) {
+            // Null check element existence to prevent crash
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
+            
+            // Cek otorisasi untuk menu sensitif
+            const protectedViews = ['laporan_kunjungan', 'laporan_keuangan', 'pengaturan'];
+            if (protectedViews.includes(view) && !isOtorisasiValid) {
+                pendingView = view;
+                const inputPwd = document.getElementById('input_password_akses');
+                if (inputPwd) inputPwd.value = '';
+                tampilModal('modalPassword', 'modalPasswordContent');
+                setTimeout(() => { if(inputPwd) inputPwd.focus(); }, 300);
+                return;
+            }
+
+            viewsList.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
+            });
+            
+            const targetId = `view-${view.replace('_', '-')}`;
+            const targetView = document.getElementById(targetId);
+            if(targetView) targetView.classList.remove('hidden');
+
+            if (view === 'pelayanan_medis') renderTabelPelayananMedis();
+            if (view === 'pelayanan_kasir') renderTabelPelayananKasir();
+            if (view === 'laporan_kunjungan') renderLaporanKunjungan();
+            if (view === 'laporan_keuangan') renderLaporanKeuangan();
+        }
+
+        // --- Logika Modal Password & Logout ---
+        function batalPassword() {
+            sembunyikanModal('modalPassword', 'modalPasswordContent');
+            pendingView = '';
+        }
+
+        function verifikasiPassword() {
+            const input = document.getElementById('input_password_akses').value;
+            if (input === appConfig.passwordAkses) {
+                isOtorisasiValid = true;
+                sembunyikanModal('modalPassword', 'modalPasswordContent');
+                showToast('Akses diizinkan', 'success');
+                if (pendingView) {
+                    switchView(pendingView);
+                    pendingView = '';
+                }
+            } else {
+                showToast('Password salah!', 'error');
+                document.getElementById('input_password_akses').value = '';
+                document.getElementById('input_password_akses').focus();
+            }
+        }
+
+        function logoutAdmin() {
+            isOtorisasiValid = false;
+            showToast('Akses Admin telah dikunci.', 'info');
+            switchView('pendaftaran');
+        }
+
+        // --- Logika Simpan Pengaturan ---
+        async function simpanConfigKeServer() {
+            try {
+                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                    await apiCall('simpanConfig', appConfig);
+                }
+            } catch (err) {
+                showToast('Gagal sinkron config: ' + err.message, 'error');
+            }
+        }
+
+        async function simpanPengaturanStruk() {
+            appConfig.strukKop = document.getElementById('set_struk_kop').value || 'Klinik';
+            appConfig.strukAlamat = document.getElementById('set_struk_alamat').value || '-';
+            appConfig.strukFooter = document.getElementById('set_struk_footer').value || '-';
+            await simpanConfigKeServer();
+            showToast('Template Struk berhasil diperbarui!', 'success');
+        }
+
+        async function simpanPengaturanPassword() {
+            const passBaru = document.getElementById('set_pass_baru').value;
+            if (!passBaru || passBaru.length < 3) {
+                showToast('Password baru harus minimal 3 karakter!', 'warning');
+                return;
+            }
+            appConfig.passwordAkses = passBaru;
+            document.getElementById('set_pass_baru').value = '';
+            await simpanConfigKeServer();
+            showToast('Password Akses berhasil diubah!', 'success');
+        }
+
+        // --- Fungsi Bawaan Formulir ---
+        function initTanggal() {
+            const selHari = document.getElementById('form_tgl_hari');
+            if(selHari && selHari.options.length <= 1) {
+                for(let i=1; i<=31; i++) {
+                    let val = i < 10 ? '0'+i : i;
+                    selHari.innerHTML += `<option value="${val}">${val}</option>`;
+                }
+            }
+            const selTahun = document.getElementById('form_tgl_tahun');
+            if(selTahun && selTahun.options.length <= 1) {
+                const tahunSekarang = new Date().getFullYear();
+                for(let i=tahunSekarang; i>=1900; i--) {
+                    selTahun.innerHTML += `<option value="${i}">${i}</option>`;
+                }
+            }
+        }
+
+        function hitungUmur() {
+            const elH = document.getElementById('form_tgl_hari');
+            const elB = document.getElementById('form_tgl_bulan');
+            const elT = document.getElementById('form_tgl_tahun');
+            if(!elH || !elB || !elT) return;
+
+            const h = elH.value;
+            const b = elB.value;
+            const t = elT.value;
+            
+            if(!h || !b || !t || t.length < 4) {
+                document.getElementById('umur_thn').value = 0; document.getElementById('umur_bln').value = 0; document.getElementById('umur_hr').value = 0;
+                return;
+            }
+            
+            const tglLahir = new Date(`${t}-${b}-${h}`);
+            const hariIni = new Date();
+            let tahun = hariIni.getFullYear() - tglLahir.getFullYear();
+            let bulan = hariIni.getMonth() - tglLahir.getMonth();
+            let hari = hariIni.getDate() - tglLahir.getDate();
+            if (bulan < 0 || (bulan === 0 && hari < 0)) { tahun--; bulan += (bulan < 0) ? 12 : 11; }
+            if (hari < 0) { const hariBulanLalu = new Date(hariIni.getFullYear(), hariIni.getMonth(), 0).getDate(); hari += hariBulanLalu; }
+            document.getElementById('umur_thn').value = tahun; document.getElementById('umur_bln').value = bulan; document.getElementById('umur_hr').value = hari;
+        }
+
+        function bukaFormBaru() {
+            initTanggal();
+            editPasienIndex = -1;
+            document.getElementById('formPasienBaru').reset();
+            document.getElementById('form_tgl_hari').value = '';
+            document.getElementById('form_tgl_bulan').value = '';
+            document.getElementById('form_tgl_tahun').value = '';
+            document.getElementById('form_erm').value = "P" + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            document.getElementById('titleModalPasien').innerHTML = '<div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>Pendaftaran Pasien Baru';
+            hitungUmur(); tampilModal('modalBuatBaru', 'modalContent');
+        }
+
+        function editPasien(erm) {
+            initTanggal();
+            const idx = patientsData.findIndex(p => p.erm === erm);
+            if(idx === -1) return;
+            editPasienIndex = idx; const p = patientsData[idx];
+            
+            document.getElementById('titleModalPasien').innerHTML = '<div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600"><i class="fas fa-edit"></i></div>Edit Data Pasien';
+            document.getElementById('form_erm').value = p.erm;
+            document.getElementById('form_nama').value = p.nama;
+            document.getElementById('form_status_kk').value = p.status_kk || '';
+            document.getElementById('form_tempat_lahir').value = p.tempatLahirRaw || '';
+            document.getElementById('form_kelurahan').value = p.kel || '';
+            document.getElementById('form_alamat').value = p.alamat || '';
+            document.getElementById('form_rt').value = p.rt || '';
+            document.getElementById('form_rw').value = p.rw || '';
+            
+            if(p.tglLahirRaw) {
+                const parts = p.tglLahirRaw.split('-'); 
+                if(parts.length === 3) {
+                    document.getElementById('form_tgl_tahun').value = parts[0];
+                    document.getElementById('form_tgl_bulan').value = parts[1];
+                    document.getElementById('form_tgl_hari').value = parts[2];
+                }
+            } else {
+                document.getElementById('form_tgl_tahun').value = '';
+                document.getElementById('form_tgl_bulan').value = '';
+                document.getElementById('form_tgl_hari').value = '';
+            }
+            
+            document.querySelectorAll('input[name="jk"]').forEach(rb => { rb.checked = (rb.value === p.jk); });
+            hitungUmur(); tampilModal('modalBuatBaru', 'modalContent');
+        }
+
+        function tutupFormBaru() { sembunyikanModal('modalBuatBaru', 'modalContent'); }
+
+        async function simpanDataBaru(event) {
+            event.preventDefault();
+            const h = document.getElementById('form_tgl_hari').value;
+            const b = document.getElementById('form_tgl_bulan').value;
+            const t = document.getElementById('form_tgl_tahun').value;
+            const tglLahirRaw = (h && b && t) ? `${t}-${b}-${h}` : '';
+
+            const dataObj = {
+                erm: document.getElementById('form_erm').value,
+                nama: document.getElementById('form_nama').value.toUpperCase(),
+                status_kk: document.getElementById('form_status_kk').value,
+                jk: document.querySelector('input[name="jk"]:checked')?.value || '-',
+                tglLahirRaw: tglLahirRaw,
+                tempatLahirRaw: document.getElementById('form_tempat_lahir').value.toUpperCase(),
+                kel: document.getElementById('form_kelurahan').value.toUpperCase() || '-',
+                alamat: document.getElementById('form_alamat').value || '-',
+                rt: document.getElementById('form_rt').value || '-',
+                rw: document.getElementById('form_rw').value || '-',
+                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag
+            };
+            
+            let tglFormatted = dataObj.tglLahirRaw ? dataObj.tglLahirRaw.split('-').reverse().join('-') : '';
+            dataObj.ttl = `${dataObj.tempatLahirRaw}${dataObj.tempatLahirRaw && tglFormatted ? ', ' : ''}${tglFormatted}`;
+            if(!dataObj.ttl) dataObj.ttl = '-';
+
+            showToast('Menyimpan data...', 'info');
+            
+            if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                try {
+                    await apiCall('simpanPasien', dataObj);
+                    showToast(`Data ${dataObj.nama} berhasil disimpan ke Server!`, 'success');
+                    tutupFormBaru();
+                    fetchDataDariSpreadsheet(); 
+                } catch(err) {
+                    showToast('Gagal menyimpan: ' + err.message, 'error');
+                }
+            } else {
+                setTimeout(() => {
+                    if (editPasienIndex === -1) { patientsData.unshift(dataObj); } 
+                    else { patientsData[editPasienIndex] = dataObj; }
+                    showToast(`Data ${dataObj.nama} tersimpan (Local Mode)!`, 'success');
+                    tutupFormBaru(); renderTabel(patientsData);
+                }, 500);
+            }
+        }
+
+        function renderTabel(data) {
+            const tb = document.getElementById('tableBody'); 
+            if(!tb) return;
+            tb.innerHTML = ''; 
+            
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput ? searchInput.value.toLowerCase() : '';
+            
+            const filteredData = data.filter(r => 
+                (r.nama && r.nama.toLowerCase().includes(query)) || 
+                (r.erm && r.erm.toLowerCase().includes(query))
+            );
+
+            if (!filteredData || filteredData.length === 0) { tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400 font-medium">Belum ada data pasien terdaftar.</td></tr>`; return; }
+
+            filteredData.forEach((row, index) => {
+                const tr = document.createElement('tr'); tr.className = "hover:bg-teal-50/30 transition-colors";
+                let nm = `<span class="font-bold text-slate-700">${row.nama}</span>`;
+                if(row.tag==='Baru') nm += `<span class="ml-2 bg-teal-100 text-teal-700 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
+                
+                let thn = "0";
+                if(row.tglLahirRaw) { const d=new Date(row.tglLahirRaw); thn = new Date().getFullYear() - d.getFullYear(); }
+                
+                let almtDisplay = row.alamat;
+                if(row.rt && row.rt !== '-' && row.rw && row.rw !== '-') {
+                    almtDisplay += `, RT.${row.rt}/RW.${row.rw}`;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-slate-400 font-medium">${index + 1}</td>
+                    <td class="p-4 text-center">
+                        <div class="flex justify-center gap-1.5">
+                            <button onclick="bukaKonfirmasi('${row.erm}')" class="w-8 h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Daftar Pelayanan"><i class="fas fa-stethoscope text-sm"></i></button>
+                            <button onclick="editPasien('${row.erm}')" class="w-8 h-8 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Edit Data"><i class="fas fa-edit text-sm"></i></button>
+                            <button onclick="bukaRiwayatLengkap('${row.erm}')" class="w-8 h-8 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Riwayat Medis"><i class="fas fa-history text-sm"></i></button>
+                        </div>
+                    </td>
+                    <td class="p-4 font-mono font-semibold text-slate-500">${row.erm}</td>
+                    <td class="p-4">${nm}</td>
+                    <td class="p-4 font-medium ${row.jk==='Laki-laki'?'text-blue-600':'text-pink-600'}">${row.jk === 'Laki-laki' ? 'L' : (row.jk === 'Perempuan' ? 'P' : '-')}</td>
+                    <td class="p-4 text-xs"><span class="font-bold text-slate-700">${thn} Thn</span><br><span class="text-slate-400">${row.ttl}</span></td>
+                    <td class="p-4 text-xs text-slate-500 truncate max-w-[200px]" title="${almtDisplay}">${almtDisplay}</td>
+                `;
+                tb.appendChild(tr);
+            });
+        }
+
+        // --- FULL DATABASE SYNC VIA FETCH ---
+        async function fetchDataDariSpreadsheet() {
+            const tb = document.getElementById('tableBody');
+            if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data API...</td></tr>`;
+            
+            if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                try {
+                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
+                        apiCall('getConfig'),
+                        apiCall('getPasienData'),
+                        apiCall('getPelayananData'),
+                        apiCall('getRiwayatData')
+                    ]);
+                    
+                    if (resConfig) {
+                        appConfig = resConfig;
+                        document.getElementById('set_struk_kop').value = appConfig.strukKop || 'eRM BPM CLINIC';
+                        document.getElementById('set_struk_alamat').value = appConfig.strukAlamat || 'Struk Resmi';
+                        document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
+                    }
+                    
+                    if (resPasien) patientsData = resPasien;
+                    
+                    if (resPelayanan) {
+                        pelayananData = resPelayanan.map(p => {
+                            const pat = patientsData.find(x => x.erm === p.erm) || {};
+                            return { ...p, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-' };
+                        });
+                    }
+                    
+                    if (resRiwayat) riwayatMedisGlobal = resRiwayat;
+                    
+                    renderTabel(patientsData);
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    updateBadges();
+                    showToast('Sinkronisasi Database Berhasil!', 'success');
+
+                } catch(err) {
+                    showToast('Gagal sinkronisasi: ' + err.message, 'error');
+                    renderTabel([]);
+                }
+            } else {
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SCRIPT_URL!', 'warning'); renderTabel(patientsData); }, 800);
+            }
+        }
+
+        // --- RIWAYAT ---
+        function bukaRiwayatLengkap(erm) {
+            const p = patientsData.find(x => x.erm === erm); if(!p) return;
+            document.getElementById('riwayatNama').textContent = p.nama; document.getElementById('riwayatErm').textContent = p.erm;
+            const tb = document.getElementById('tableRiwayatList'); tb.innerHTML = '';
+            const hist = riwayatMedisGlobal.filter(h => h.erm === erm);
+            if(hist.length === 0) tb.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">Belum ada riwayat kunjungan pelayanan medis.</td></tr>`;
+            else {
+                hist.reverse().forEach(h => {
+                    tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-xs text-slate-400 font-mono">${h.jam}</span></td><td class="p-4 align-top font-medium text-slate-600">${h.keluhan||'-'}</td><td class="p-4 align-top text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block">S: ${h.suhu?h.suhu+'°C':'-'}</span></td><td class="p-4 align-top font-mono text-xs text-teal-700 bg-teal-50/30 whitespace-pre-wrap rounded-r-lg">${h.resep||'-'}</td></tr>`;
+                });
+            }
+            tampilModal('modalRiwayat', 'modalRiwayatContent');
+        }
+        function tutupRiwayat() { sembunyikanModal('modalRiwayat', 'modalRiwayatContent'); }
+        function bukaRiwayatDariPelayanan() { if(rekamMedisAktif) bukaRiwayatLengkap(rekamMedisAktif.erm); }
+
+        // --- KONFIRMASI ANTRIAN ---
+        let pasienPelayananAktif = null;
+        function bukaKonfirmasi(erm) {
+            pasienPelayananAktif = patientsData.find(p => p.erm === erm); if(!pasienPelayananAktif) return;
+            document.getElementById('teksKonfirmasi').innerHTML = `Apakah Anda yakin mengirim <b>${pasienPelayananAktif.nama}</b> (<span class="font-mono">${pasienPelayananAktif.erm}</span>) ke poli pemeriksaan medis?`;
+            tampilModal('modalKonfirmasi', 'modalKonfirmasiContent');
+        }
+        function tutupKonfirmasi() { sembunyikanModal('modalKonfirmasi', 'modalKonfirmasiContent'); }
+        
+        async function prosesPelayanan() {
+            if(pasienPelayananAktif) {
+                if (pelayananData.some(p => p.erm === pasienPelayananAktif.erm && p.status !== 'selesai_kasir')) { 
+                    showToast('Pasien ini sudah ada di antrean aktif!', 'warning'); return; 
+                }
+                
+                const d = new Date();
+                const newAntrean = { 
+                    ...pasienPelayananAktif, 
+                    waktuDaftar: d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 
+                    tanggalSistem: d, 
+                    status: 'antrean_medis' 
+                };
+                
+                pelayananData.push(newAntrean);
+                updateBadges(); 
+                showToast(`Kirim ke Poli Medis Berhasil!`, 'success'); 
+                tutupKonfirmasi();
+                
+                const vPelayananMedis = document.getElementById('view-pelayanan-medis');
+                if (vPelayananMedis && !vPelayananMedis.classList.contains('hidden')) {
+                    renderTabelPelayananMedis();
+                }
+
+                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                    try {
+                        const dataToServer = { ...newAntrean, tanggalSistem: newAntrean.tanggalSistem.toISOString() };
+                        await apiCall('simpanPelayanan', dataToServer);
+                    } catch(err) {
+                        showToast('Gagal server: '+err.message,'error');
+                    }
+                }
+            }
+        }
+
+        // --- PELAYANAN MEDIS ---
+        function renderTabelPelayananMedis() {
+            const tb = document.getElementById('tableBodyPelayananMedis'); 
+            if(!tb) return;
+            tb.innerHTML = '';
+            
+            let filterDateInput = document.getElementById('filter_tgl_medis');
+            if(!filterDateInput.value) {
+                const today = new Date();
+                filterDateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            }
+            const filterDate = filterDateInput.value;
+
+            const filteredData = pelayananData.filter(p => {
+                if(!p.tanggalSistem) return false;
+                const d = new Date(p.tanggalSistem);
+                const pDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                return pDate === filterDate;
+            });
+
+            if (filteredData.length === 0) { tb.innerHTML = `<tr><td colspan="5" class="p-16 text-center text-slate-400 font-medium">Tidak ada antrean medis pada tanggal ini.</td></tr>`; return; }
+            
+            filteredData.forEach((row, idx) => {
+                const tr = document.createElement('tr'); const blm = row.status === 'antrean_medis';
+                tr.className = blm ? "bg-yellow-100 hover:bg-yellow-200 transition-colors" : "bg-green-100 hover:bg-green-200 transition-colors";
+                
+                let btn = blm 
+                    ? `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm w-full transition-transform transform hover:scale-105"><i class="fas fa-stethoscope mr-2"></i> Periksa</button>`
+                    : `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-white border border-green-400 text-green-700 hover:bg-green-50 text-xs font-bold px-4 py-2 rounded-lg w-full transition-colors shadow-sm"><i class="fas fa-edit mr-2"></i> Edit Hasil</button>`;
+
+                tr.innerHTML = `<td class="p-4 text-center font-bold text-slate-700">${idx+1}</td><td class="p-4 font-mono font-semibold text-slate-700">${row.erm}</td><td class="p-4 font-bold text-slate-900 uppercase">${row.nama}</td><td class="p-4 text-slate-600 font-medium"><i class="far fa-clock mr-1"></i> ${row.waktuDaftar}</td><td class="p-4 text-center px-4">${btn}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        let rekamMedisAktif = null;
+        function bukaFormPelayanan(erm) {
+            rekamMedisAktif = pelayananData.find(p => p.erm === erm); if(!rekamMedisAktif) return;
+            document.getElementById('info_nama_pelayanan').textContent = rekamMedisAktif.nama; document.getElementById('info_erm_pelayanan').textContent = rekamMedisAktif.erm;
+            ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { document.getElementById('pel_'+k).value = rekamMedisAktif[k] || ''; });
+            tampilModal('modalPelayanan', 'modalPelayananContent');
+        }
+        function tutupFormPelayanan() { sembunyikanModal('modalPelayanan', 'modalPelayananContent'); }
+        
+        async function simpanDataPelayanan(e) {
+            e.preventDefault();
+            if(rekamMedisAktif) {
+                const idx = pelayananData.findIndex(p => p.erm === rekamMedisAktif.erm);
+                let logRiwayat = null;
+                if(idx !== -1) {
+                    ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { pelayananData[idx][k] = document.getElementById('pel_'+k).value; });
+                    if(pelayananData[idx].status === 'antrean_medis') {
+                        pelayananData[idx].status = 'antrean_kasir'; 
+                        pelayananData[idx].waktuMedisSelesai = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const ts = new Date(pelayananData[idx].tanggalSistem);
+                        
+                        logRiwayat = { erm: pelayananData[idx].erm, tgl: ts.toLocaleDateString('id-ID'), jam: ts.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), keluhan: pelayananData[idx].keluhan, td: pelayananData[idx].td, suhu: pelayananData[idx].suhu, resep: pelayananData[idx].resep };
+                        riwayatMedisGlobal.push(logRiwayat);
+                    }
+                }
+                
+                showToast(`Pemeriksaan Selesai, Terkirim ke Kasir!`, 'success'); 
+                tutupFormPelayanan(); updateBadges(); renderTabelPelayananMedis();
+
+                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                    try {
+                        const dataToServer = { ...pelayananData[idx], tanggalSistem: new Date(pelayananData[idx].tanggalSistem).toISOString() };
+                        await apiCall('simpanPelayanan', dataToServer);
+                        if(logRiwayat) await apiCall('simpanRiwayat', logRiwayat);
+                    } catch(err) {
+                        showToast('Gagal server: '+err.message,'error');
+                    }
+                }
+            }
+        }
+
+        // --- KASIR ---
+        function renderTabelPelayananKasir() {
+            const tb = document.getElementById('tableBodyPelayananKasir'); 
+            if(!tb) return;
+            tb.innerHTML = '';
+            const dk = pelayananData.filter(p => p.status === 'antrean_kasir' || p.status === 'selesai_kasir');
+            if (dk.length === 0) { tb.innerHTML = `<tr><td colspan="5" class="p-16 text-center text-slate-400 font-medium">Tidak ada tagihan tertunda.</td></tr>`; return; }
+
+            dk.forEach((row, idx) => {
+                const tr = document.createElement('tr'); const lunas = row.status === 'selesai_kasir';
+                tr.className = "hover:bg-orange-50/30 transition-colors border-b border-slate-100";
+                
+                let btn = lunas 
+                    ? `<button onclick="bukaFormKasir('${row.erm}')" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg w-full transition flex justify-center items-center"><i class="fas fa-print mr-2"></i> Cetak</button>`
+                    : `<button onclick="bukaFormKasir('${row.erm}')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm w-full transition transform hover:scale-105 flex justify-center items-center"><i class="fas fa-wallet mr-2"></i> Bayar</button>`;
+
+                tr.innerHTML = `<td class="p-4 text-center font-bold text-slate-500">${idx+1}</td><td class="p-4 font-mono font-semibold text-slate-600">${row.erm}</td><td class="p-4 font-bold text-slate-800 uppercase ${lunas?'opacity-50':''}">${row.nama}</td><td class="p-4 text-orange-600 font-medium"><i class="far fa-check-circle mr-1"></i> ${row.waktuMedisSelesai||'-'}</td><td class="p-4 text-center px-4">${btn}</td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        let pasienKasirAktif = null;
+        function bukaFormKasir(erm) {
+            pasienKasirAktif = pelayananData.find(p => p.erm === erm); if(!pasienKasirAktif) return;
+            document.getElementById('info_nama_kasir').textContent = pasienKasirAktif.nama; document.getElementById('info_erm_kasir').textContent = pasienKasirAktif.erm;
+            document.getElementById('info_resep_kasir').textContent = pasienKasirAktif.resep || '-';
+            const inT = document.getElementById('input_tagihan_kasir'), btnS = document.getElementById('btnSimpanKasir'), btnC = document.getElementById('btnCetakStruk');
+            if(pasienKasirAktif.status === 'selesai_kasir') { inT.value = pasienKasirAktif.tagihan || 0; inT.disabled = true; btnS.classList.add('hidden'); btnC.classList.remove('hidden'); } 
+            else { inT.value = ''; inT.disabled = false; btnS.classList.remove('hidden'); btnC.classList.add('hidden'); }
+            tampilModal('modalKasir', 'modalKasirContent');
+        }
+        function tutupFormKasir() { sembunyikanModal('modalKasir', 'modalKasirContent'); }
+        
+        async function simpanDataKasir() {
+            const nom = document.getElementById('input_tagihan_kasir').value;
+            if(!nom) { showToast('Masukkan nominal tagihan!', 'warning'); return; }
+            if(pasienKasirAktif) {
+                const idx = pelayananData.findIndex(p => p.erm === pasienKasirAktif.erm);
+                if(idx !== -1) { pelayananData[idx].status = 'selesai_kasir'; pelayananData[idx].tagihan = nom; }
+                showToast(`Pembayaran LUNAS!`, 'success');
+                document.getElementById('input_tagihan_kasir').disabled = true; document.getElementById('btnSimpanKasir').classList.add('hidden'); document.getElementById('btnCetakStruk').classList.remove('hidden');
+                updateBadges(); renderTabelPelayananKasir(); 
+                
+                const vPelayananMedis = document.getElementById('view-pelayanan-medis');
+                if (vPelayananMedis && !vPelayananMedis.classList.contains('hidden')) renderTabelPelayananMedis();
+
+                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                    try {
+                        const dataToServer = { ...pelayananData[idx], tanggalSistem: new Date(pelayananData[idx].tanggalSistem).toISOString() };
+                        await apiCall('simpanPelayanan', dataToServer);
+                    } catch(err) {
+                        showToast('Gagal server: '+err.message, 'error');
+                    }
+                }
+            }
+        }
+
+        function cetakStrukKasir() {
+            if(!pasienKasirAktif) return;
+            const rp = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(pasienKasirAktif.tagihan);
+            const pw = window.open('', '_blank', 'width=350,height=600');
+            
+            // Format HTML Struk Dinamis menggunakan variabel konfigurasi
+            pw.document.write(`<html><body style="font-family:monospace; margin:0; padding:20px; text-align:center;">
+                <h2 style="margin-bottom:0;">${appConfig.strukKop}</h2>
+                <p style="font-size:12px;margin-top:0;">${appConfig.strukAlamat}</p><hr>
+                <p align="left"><b>eRM:</b> ${pasienKasirAktif.erm}<br><b>Nama:</b> ${pasienKasirAktif.nama}<br><b>Tgl:</b> ${new Date().toLocaleString('id-ID')}</p><hr>
+                <p align="left"><b>Rincian:</b><br>${pasienKasirAktif.resep}</p><hr>
+                <h2 align="right">TOTAL:<br>${rp}</h2><hr>
+                <p style="font-size:10px;">${appConfig.strukFooter}</p>
+            </body></html>`);
+            pw.document.close(); pw.focus(); setTimeout(() => { pw.print(); }, 500);
+        }
+
+        // --- LAPORAN ---
+        function toggleCustomDate(type) {
+            const selectVal = document.getElementById(`filter_waktu_${type}`).value;
+            const customDiv = document.getElementById(`custom_date_${type}`);
+            if (selectVal === 'rentang') {
+                customDiv.classList.remove('hidden');
+            } else {
+                customDiv.classList.add('hidden');
+            }
+        }
+
+        function filterDataByDate(arr, type, startId, endId) {
+            const n = new Date();
+            const tdy = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+            const wk = new Date(tdy); wk.setDate(n.getDate() - n.getDay()); 
+            const mo = new Date(n.getFullYear(), n.getMonth(), 1);
+            
+            return arr.filter(i => { 
+                if(!i.tanggalSistem) return false; 
+                const d = new Date(i.tanggalSistem); 
+                const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+                if (type === 'hari_ini') return dOnly.getTime() === tdy.getTime(); 
+                if (type === 'minggu_ini') return d >= wk; 
+                if (type === 'bulan_ini') return d >= mo; 
+                if (type === 'rentang') {
+                    const startStr = document.getElementById(startId).value;
+                    const endStr = document.getElementById(endId).value;
+                    if(!startStr || !endStr) return true; 
+                    
+                    const start = new Date(startStr); start.setHours(0,0,0,0);
+                    const end = new Date(endStr); end.setHours(23,59,59,999);
+                    return d >= start && d <= end;
+                }
+                return true; 
+            });
+        }
+        
+        function renderLaporanKunjungan() {
+            const filterType = document.getElementById('filter_waktu_kunjungan').value;
+            const fd = filterDataByDate(pelayananData, filterType, 'kunjungan_start', 'kunjungan_end'); 
+            const tb = document.getElementById('tableBodyLaporanKunjungan'); 
+            if(!tb) return;
+            tb.innerHTML = '';
+            if (fd.length === 0) { tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Data Kosong.</td></tr>`; return; }
+            fd.forEach((r, i) => {
+                let st = r.status === 'selesai_kasir' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">LUNAS</span>' : (r.status === 'antrean_kasir' ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">KASIR</span>' : '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">MEDIS</span>');
+                
+                let alamatLengkap = r.alamat || '-';
+                if (r.rt && r.rt !== '-' && r.rw && r.rw !== '-') alamatLengkap += ` RT.${r.rt}/RW.${r.rw}`;
+                if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
+
+                tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-center">${i+1}</td><td class="p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuDaftar}</td><td class="p-4 font-mono">${r.erm}</td><td class="p-4 font-bold uppercase">${r.nama}</td><td class="p-4">${r.jk}</td><td class="p-4 text-xs truncate max-w-[150px]">${alamatLengkap}</td><td class="p-4">${st}</td></tr>`;
+            });
+        }
+        
+        function renderLaporanKeuangan() {
+            const filterType = document.getElementById('filter_waktu_keuangan').value;
+            const fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir'), filterType, 'keuangan_start', 'keuangan_end'); 
+            const tb = document.getElementById('tableBodyLaporanKeuangan'), tf = document.getElementById('tfootLaporanKeuangan'); 
+            if(!tb) return;
+            tb.innerHTML = ''; tf.innerHTML = '';
+            if (fd.length === 0) { tb.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">Data Kosong.</td></tr>`; return; }
+            let tot = 0; const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' });
+            fd.forEach((r, i) => { const tag = parseFloat(r.tagihan) || 0; tot += tag; tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-center">${i+1}</td><td class="p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuMedisSelesai}</td><td class="p-4 font-mono">${r.erm}</td><td class="p-4 font-bold uppercase">${r.nama}</td><td class="p-4 text-right text-emerald-600 font-bold">${fmt.format(tag)}</td></tr>`; });
+            tf.innerHTML = `<tr><td colspan="4" class="p-4 text-right uppercase">Total:</td><td class="p-4 text-right text-xl">${fmt.format(tot)}</td></tr>`;
+        }
+        
+        function downloadLaporan(t) {
+            let fd = [], f = '', nm = '', csv = "sep=,\n";
+            if (t === 'kunjungan') {
+                f = document.getElementById('filter_waktu_kunjungan').value; 
+                fd = filterDataByDate(pelayananData, f, 'kunjungan_start', 'kunjungan_end'); 
+                nm = `Laporan_Kunjungan_ERM_${Date.now()}.csv`; 
+                csv += "No,Tanggal,Waktu,eRM,Nama Pasien,Jenis Kelamin,Alamat Lengkap,Status Kunjungan\n";
+                fd.forEach((r, i) => { 
+                    let alamatLengkap = r.alamat || '-';
+                    if (r.rt && r.rt !== '-' && r.rw && r.rw !== '-') alamatLengkap += ` RT.${r.rt}/RW.${r.rw}`;
+                    if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
+                    
+                    let statusTxt = r.status === 'selesai_kasir' ? 'Selesai' : (r.status === 'antrean_kasir' ? 'Kasir' : 'Medis');
+                    csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.waktuDaftar}","${r.erm}","${r.nama}","${r.jk}","${alamatLengkap}","${statusTxt}"\n`; 
+                });
+            } else {
+                f = document.getElementById('filter_waktu_keuangan').value; 
+                fd = filterDataByDate(pelayananData.filter(p=>p.status==='selesai_kasir'), f, 'keuangan_start', 'keuangan_end'); 
+                nm = `Laporan_Keuangan_ERM_${Date.now()}.csv`; 
+                csv += "No,Tanggal Pembayaran,Waktu Lunas,eRM,Nama Pasien,Nominal Tagihan (Rp)\n"; 
+                let tot = 0;
+                fd.forEach((r, i) => { 
+                    const tag = parseFloat(r.tagihan)||0; tot += tag; 
+                    csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.waktuMedisSelesai}","${r.erm}","${r.nama}",${tag}\n`; 
+                }); 
+                csv += `,,,,TOTAL,${tot}\n`;
+            }
+            if (fd.length === 0) { showToast('Tidak ada data untuk didownload!', 'warning'); return; }
+            
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const l = document.createElement("a"); 
+            l.setAttribute("href", url); 
+            l.setAttribute("download", nm); 
+            document.body.appendChild(l); 
+            l.click(); 
+            document.body.removeChild(l);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        function updateBadges() {
+            const m = pelayananData.filter(p => p.status === 'antrean_medis').length, k = pelayananData.filter(p => p.status === 'antrean_kasir').length;
+            const bP = document.getElementById('badgePelayanan'), bM = document.getElementById('badgeDropdownMedis'), bK = document.getElementById('badgeDropdownKasir');
+            if(m+k>0){bP.textContent=m+k; bP.classList.remove('hidden');} else bP.classList.add('hidden');
+            if(m>0){bM.textContent=m; bM.classList.remove('hidden');} else bM.classList.add('hidden');
+            if(k>0){bK.textContent=k; bK.classList.remove('hidden');} else bK.classList.add('hidden');
+        }
+
+        function tampilModal(m,c){
+            const modal = document.getElementById(m); const content = document.getElementById(c);
+            if(modal && content) {
+                modal.classList.remove('hidden'); 
+                requestAnimationFrame(()=>{content.classList.remove('modal-enter'); content.classList.add('modal-enter-active');});
+            }
+        }
+        function sembunyikanModal(m,c){
+            const modal = document.getElementById(m); const content = document.getElementById(c);
+            if(modal && content) {
+                content.classList.remove('modal-enter-active'); content.classList.add('modal-leave-active'); 
+                setTimeout(()=>{modal.classList.add('hidden'); content.classList.remove('modal-leave-active'); content.classList.add('modal-enter');},200);
+            }
+        }
+
+        // Init
+        fetchDataDariSpreadsheet();
+    </script>
+</body>
+</html>
