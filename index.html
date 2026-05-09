@@ -9,7 +9,7 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #334155; } 
@@ -21,6 +21,10 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Hide scrollbar for mobile navbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .toast-enter { transform: translateY(-100%) scale(0.9); opacity: 0; }
         .toast-enter-active { transform: translateY(0) scale(1); opacity: 1; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -38,14 +42,14 @@
         .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
     </style>
 </head>
-<body class="text-sm">
+<body class="text-sm overflow-x-hidden">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast-container" class="fixed top-6 right-6 z-[300] flex flex-col gap-3 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-6 right-6 z-[300] flex flex-col gap-3 pointer-events-none w-[90%] md:w-auto max-w-sm"></div>
 
     <!-- MODAL AKSES PASSWORD -->
-    <div id="modalPassword" class="fixed inset-0 bg-slate-900/70 z-[250] hidden flex justify-center items-center backdrop-blur-sm">
-        <div id="modalPasswordContent" class="bg-white rounded-2xl shadow-2xl p-8 w-[350px] modal-enter border border-slate-100">
+    <div id="modalPassword" class="fixed inset-0 bg-slate-900/70 z-[250] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalPasswordContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[350px] modal-enter border border-slate-100">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-rose-200">
                     <i class="fas fa-lock text-2xl"></i>
@@ -67,24 +71,24 @@
     </div>
 
     <!-- MODAL BUAT BARU / EDIT PASIEN -->
-    <div id="modalBuatBaru" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-start pt-10 pb-10 overflow-y-auto">
-        <div id="modalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-4 modal-enter border border-slate-100">
-            <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl">
-                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3" id="titleModalPasien">
-                    <div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>
-                    Pendaftaran Pasien Baru
+    <div id="modalBuatBaru" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-start pt-4 md:pt-10 pb-10 overflow-y-auto px-4">
+        <div id="modalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl modal-enter border border-slate-100">
+            <div class="px-5 md:px-8 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-3" id="titleModalPasien">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>
+                    Pendaftaran Pasien
                 </h2>
                 <button onclick="tutupFormBaru()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center focus:outline-none">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
-            <div class="p-8 bg-slate-50/50">
+            <div class="p-5 md:p-8 bg-slate-50/50">
                 <form id="formPasienBaru" onsubmit="simpanDataBaru(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                         <!-- KOLOM KIRI -->
-                        <div class="space-y-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Informasi Pribadi</h3>
+                        <div class="space-y-4 md:space-y-5 bg-white p-5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 border-b border-slate-100 pb-2">Informasi Pribadi</h3>
                             
                             <div>
                                 <label class="form-label">No. eRM <span class="text-rose-500">*</span></label>
@@ -96,7 +100,7 @@
                                 <input type="text" id="form_nama" required placeholder="Masukkan nama sesuai KTP" class="form-input uppercase">
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="form-label">Status KK</label>
                                     <select id="form_status_kk" class="form-input cursor-pointer">
@@ -109,18 +113,18 @@
                                 <div>
                                     <label class="form-label">Jenis Kelamin <span class="text-rose-500">*</span></label>
                                     <div class="flex items-center space-x-4 h-[38px]">
-                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Laki-laki" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Laki-laki</label>
-                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Perempuan" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Perempuan</label>
+                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Laki-laki" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Laki</label>
+                                        <label class="flex items-center cursor-pointer hover:text-teal-600 transition-colors"><input type="radio" name="jk" value="Perempuan" required class="mr-2 w-4 h-4 text-teal-600 focus:ring-teal-500"> Pr</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- KOLOM KANAN -->
-                        <div class="space-y-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Detail Kelahiran & Domisili</h3>
+                        <div class="space-y-4 md:space-y-5 bg-white p-5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 md:mb-4 border-b border-slate-100 pb-2">Detail Kelahiran & Domisili</h3>
                             
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="form-label">Tempat Lahir</label>
                                     <input type="text" id="form_tempat_lahir" placeholder="Kota Kelahiran" class="form-input uppercase">
@@ -128,17 +132,17 @@
                                 <div>
                                     <label class="form-label">Tanggal Lahir</label>
                                     <div class="grid grid-cols-3 gap-1">
-                                        <select id="form_tgl_hari" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                        <select id="form_tgl_hari" class="form-input px-0.5 text-center text-xs sm:text-sm" onchange="hitungUmur()">
                                             <option value="">Hari</option>
                                         </select>
-                                        <select id="form_tgl_bulan" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                        <select id="form_tgl_bulan" class="form-input px-0.5 text-center text-xs sm:text-sm" onchange="hitungUmur()">
                                             <option value="">Bln</option>
                                             <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
                                             <option value="04">Apr</option><option value="05">Mei</option><option value="06">Jun</option>
                                             <option value="07">Jul</option><option value="08">Agu</option><option value="09">Sep</option>
                                             <option value="10">Okt</option><option value="11">Nov</option><option value="12">Des</option>
                                         </select>
-                                        <select id="form_tgl_tahun" class="form-input px-1 text-center" onchange="hitungUmur()">
+                                        <select id="form_tgl_tahun" class="form-input px-0.5 text-center text-xs sm:text-sm" onchange="hitungUmur()">
                                             <option value="">Thn</option>
                                         </select>
                                     </div>
@@ -148,12 +152,12 @@
                             <div>
                                 <label class="form-label">Usia Pasien</label>
                                 <div class="flex border border-slate-200 rounded-lg overflow-hidden bg-slate-50 shadow-inner">
-                                    <input type="number" id="umur_thn" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
-                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Tahun</div>
-                                    <input type="number" id="umur_bln" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
-                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Bulan</div>
-                                    <input type="number" id="umur_hr" value="0" readonly class="w-full px-3 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
-                                    <div class="px-3 py-2 text-xs text-slate-500 flex items-center bg-slate-100 border-l border-slate-200 font-medium">Hari</div>
+                                    <input type="number" id="umur_thn" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Thn</div>
+                                    <input type="number" id="umur_bln" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Bln</div>
+                                    <input type="number" id="umur_hr" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-l border-slate-200 font-medium">Hari</div>
                                 </div>
                             </div>
 
@@ -179,11 +183,11 @@
                         </div>
                     </div>
                     
-                    <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
-                        <button type="button" onclick="tutupFormBaru()" class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 font-semibold transition-all">
+                    <div class="mt-6 md:mt-8 pt-4 md:pt-5 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                        <button type="button" onclick="tutupFormBaru()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-slate-300 text-slate-600 bg-white hover:bg-slate-50 font-semibold transition-all">
                             Batalkan
                         </button>
-                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-brand text-white hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 font-semibold transition-all flex items-center gap-2">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-brand text-white hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 font-semibold transition-all flex items-center justify-center gap-2">
                             <i class="fas fa-save"></i> Simpan Pasien
                         </button>
                     </div>
@@ -193,36 +197,36 @@
     </div>
 
     <!-- MODAL RIWAYAT PASIEN -->
-    <div id="modalRiwayat" class="fixed inset-0 bg-slate-900/60 z-[160] hidden flex justify-center items-start pt-10 pb-10 overflow-y-auto backdrop-blur-sm">
-        <div id="modalRiwayatContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 modal-enter border border-slate-100">
-            <div class="px-8 py-5 border-b border-indigo-100 flex justify-between items-center bg-indigo-50/50 rounded-t-2xl">
-                <h2 class="text-xl font-bold text-indigo-800 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fas fa-history"></i></div>
-                    Riwayat Rekam Medis
+    <div id="modalRiwayat" class="fixed inset-0 bg-slate-900/60 z-[160] hidden flex justify-center items-start pt-4 md:pt-10 pb-10 overflow-y-auto backdrop-blur-sm px-4">
+        <div id="modalRiwayatContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl modal-enter border border-slate-100">
+            <div class="px-5 md:px-8 py-4 md:py-5 border-b border-indigo-100 flex justify-between items-center bg-indigo-50/50 rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-lg md:text-xl font-bold text-indigo-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fas fa-history"></i></div>
+                    Riwayat Medis
                 </h2>
                 <button onclick="tutupRiwayat()" class="w-8 h-8 rounded-full hover:bg-indigo-100 text-indigo-400 hover:text-indigo-600 transition-colors flex items-center justify-center focus:outline-none">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
-            <div class="p-8">
-                <div class="flex justify-between mb-6 items-center bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div class="p-5 md:p-8">
+                <div class="flex flex-col sm:flex-row justify-between mb-6 items-start sm:items-center bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm gap-2">
                     <div>
                         <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Nama Pasien</span>
-                        <span id="riwayatNama" class="font-bold text-slate-800 uppercase text-lg"></span>
+                        <span id="riwayatNama" class="font-bold text-slate-800 uppercase text-base md:text-lg"></span>
                     </div>
-                    <div class="text-right">
+                    <div class="sm:text-right">
                         <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">No. eRM</span>
-                        <span id="riwayatErm" class="font-mono text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100"></span>
+                        <span id="riwayatErm" class="font-mono text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 inline-block"></span>
                     </div>
                 </div>
                 <div class="table-container max-h-[400px] overflow-y-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left">
-                        <thead class="bg-indigo-50 text-indigo-700 text-xs uppercase font-bold sticky top-0 shadow-sm">
+                    <table class="w-full text-left min-w-[600px]">
+                        <thead class="bg-indigo-50 text-indigo-700 text-xs uppercase font-bold sticky top-0 shadow-sm z-10">
                             <tr>
-                                <th class="p-4 border-b border-indigo-100">Tgl Kunjungan</th>
-                                <th class="p-4 border-b border-indigo-100">Keluhan</th>
-                                <th class="p-4 border-b border-indigo-100">Vital Sign</th>
-                                <th class="p-4 border-b border-indigo-100">Diagnosa/Resep</th>
+                                <th class="p-3 md:p-4 border-b border-indigo-100">Tgl Kunjungan</th>
+                                <th class="p-3 md:p-4 border-b border-indigo-100">Keluhan</th>
+                                <th class="p-3 md:p-4 border-b border-indigo-100">Vital Sign</th>
+                                <th class="p-3 md:p-4 border-b border-indigo-100">Diagnosa/Resep</th>
                             </tr>
                         </thead>
                         <tbody id="tableRiwayatList" class="text-sm text-slate-600 divide-y divide-slate-100">
@@ -234,31 +238,31 @@
     </div>
 
     <!-- MODAL KONFIRMASI PELAYANAN -->
-    <div id="modalKonfirmasi" class="fixed inset-0 bg-slate-900/60 z-[130] hidden flex justify-center items-center backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-[400px] max-w-full modal-enter text-center border border-slate-100" id="modalKonfirmasiContent">
-            <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-blue-50 mb-6 border-8 border-white shadow-md relative -top-12">
-                <i class="fas fa-stethoscope text-4xl text-blue-500"></i>
+    <div id="modalKonfirmasi" class="fixed inset-0 bg-slate-900/60 z-[130] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[400px] modal-enter text-center border border-slate-100" id="modalKonfirmasiContent">
+            <div class="mx-auto flex items-center justify-center h-20 w-20 md:h-24 md:w-24 rounded-full bg-blue-50 mb-6 border-8 border-white shadow-md relative -top-10 md:-top-12">
+                <i class="fas fa-stethoscope text-3xl md:text-4xl text-blue-500"></i>
             </div>
-            <h3 class="text-2xl font-extrabold text-slate-800 mb-2 -mt-8">Kirim ke Antrean</h3>
-            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="teksKonfirmasi"></p>
+            <h3 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 -mt-6 md:-mt-8">Kirim ke Antrean</h3>
+            <p class="text-sm text-slate-500 mb-6 md:mb-8 leading-relaxed" id="teksKonfirmasi"></p>
             <div class="flex justify-center gap-3 w-full">
-                <button onclick="tutupKonfirmasi()" class="px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2">Batalkan</button>
-                <button onclick="prosesPelayanan()" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition w-1/2">Ya, Proses</button>
+                <button onclick="tutupKonfirmasi()" class="px-4 md:px-6 py-2.5 md:py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2">Batal</button>
+                <button onclick="prosesPelayanan()" class="px-4 md:px-6 py-2.5 md:py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transition w-1/2">Proses</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL FORM PELAYANAN MEDIS -->
-    <div id="modalPelayanan" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-start pt-8 pb-8 overflow-y-auto backdrop-blur-sm">
-        <div id="modalPelayananContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-4 modal-enter border border-slate-100">
-            <div class="px-8 py-5 border-b border-blue-100 flex justify-between items-center bg-blue-50/50 rounded-t-2xl">
-                <h2 class="text-xl font-bold text-blue-800 flex items-center gap-3" id="titleModalPemeriksaan">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fas fa-stethoscope"></i></div>
-                    Rekam Medis Elektronik
+    <div id="modalPelayanan" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-start pt-4 md:pt-8 pb-8 overflow-y-auto backdrop-blur-sm px-4">
+        <div id="modalPelayananContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl modal-enter border border-slate-100">
+            <div class="px-5 md:px-8 py-4 md:py-5 border-b border-blue-100 flex justify-between items-center bg-blue-50/50 rounded-t-2xl sticky top-0 z-10">
+                <h2 class="text-lg md:text-xl font-bold text-blue-800 flex items-center gap-3" id="titleModalPemeriksaan">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fas fa-stethoscope"></i></div>
+                    <span class="hidden sm:inline">Rekam Medis Elektronik</span><span class="sm:hidden">Rekam Medis</span>
                 </h2>
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="bukaRiwayatDariPelayanan()" class="text-indigo-600 border border-indigo-200 bg-white hover:bg-indigo-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center shadow-sm">
-                        <i class="fas fa-history mr-2"></i> Histori Pasien
+                <div class="flex items-center gap-2 md:gap-3">
+                    <button type="button" onclick="bukaRiwayatDariPelayanan()" class="text-indigo-600 border border-indigo-200 bg-white hover:bg-indigo-50 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors flex items-center shadow-sm">
+                        <i class="fas fa-history mr-1.5 md:mr-2"></i> <span class="hidden sm:inline">Histori</span>
                     </button>
                     <button onclick="tutupFormPelayanan()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
                         <i class="fas fa-times text-lg"></i>
@@ -266,54 +270,54 @@
                 </div>
             </div>
             
-            <div class="p-8">
-                <div class="bg-gradient-to-r from-slate-50 to-white p-5 rounded-xl border border-slate-200 mb-8 flex justify-between items-center shadow-sm">
+            <div class="p-5 md:p-8">
+                <div class="bg-gradient-to-r from-slate-50 to-white p-4 md:p-5 rounded-xl border border-slate-200 mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm gap-2">
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pasien Saat Ini</p>
-                        <p class="text-xl font-extrabold text-slate-800 uppercase" id="info_nama_pelayanan">-</p>
+                        <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pasien Saat Ini</p>
+                        <p class="text-lg md:text-xl font-extrabold text-slate-800 uppercase" id="info_nama_pelayanan">-</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">No. eRM</p>
-                        <p class="text-base font-mono font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-md border border-blue-100 inline-block" id="info_erm_pelayanan">-</p>
+                    <div class="sm:text-right">
+                        <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">No. eRM</p>
+                        <p class="text-sm md:text-base font-mono font-bold text-blue-600 bg-blue-50 px-2 md:px-3 py-1 rounded-md border border-blue-100 inline-block" id="info_erm_pelayanan">-</p>
                     </div>
                 </div>
 
                 <form id="formDataPelayanan" onsubmit="simpanDataPelayanan(event)">
-                    <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <label class="form-label text-base mb-3"><i class="fas fa-comment-medical text-blue-500 mr-2"></i>Keluhan Utama Pasien <span class="text-rose-500">*</span></label>
-                            <textarea id="pel_keluhan" required rows="2" placeholder="Anamnesa / Keluhan saat datang..." class="form-input text-base"></textarea>
+                    <div class="space-y-4 md:space-y-6">
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <label class="form-label text-sm md:text-base mb-2 md:mb-3"><i class="fas fa-comment-medical text-blue-500 mr-2"></i>Keluhan Utama Pasien <span class="text-rose-500">*</span></label>
+                            <textarea id="pel_keluhan" required rows="2" placeholder="Anamnesa / Keluhan saat datang..." class="form-input text-sm md:text-base"></textarea>
                         </div>
 
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <label class="form-label text-base border-b border-slate-100 pb-3 mb-4"><i class="fas fa-heartbeat text-rose-500 mr-2"></i>Tanda-Tanda Vital (TTV)</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">TD (mmHg)</label><input type="text" id="pel_td" class="form-input bg-slate-50" placeholder="120/80"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Nadi (x/m)</label><input type="number" id="pel_nadi" class="form-input bg-slate-50" placeholder="80"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Nafas (x/m)</label><input type="number" id="pel_nafas" class="form-input bg-slate-50" placeholder="20"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">Suhu (°C)</label><input type="number" step="0.1" id="pel_suhu" class="form-input bg-slate-50" placeholder="36.5"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">SpO2 (%)</label><input type="number" id="pel_spo2" class="form-input bg-slate-50" placeholder="98"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">TB (cm)</label><input type="number" id="pel_tb" class="form-input bg-slate-50" placeholder="160"></div>
-                                <div><label class="block text-xs font-semibold text-slate-500 mb-1">BB (kg)</label><input type="number" step="0.1" id="pel_bb" class="form-input bg-slate-50" placeholder="60.5"></div>
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <label class="form-label text-sm md:text-base border-b border-slate-100 pb-2 md:pb-3 mb-3 md:mb-4"><i class="fas fa-heartbeat text-rose-500 mr-2"></i>Tanda-Tanda Vital (TTV)</label>
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">TD (mmHg)</label><input type="text" id="pel_td" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="120/80"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">Nadi (x/m)</label><input type="number" id="pel_nadi" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="80"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">Nafas (x/m)</label><input type="number" id="pel_nafas" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="20"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">Suhu (°C)</label><input type="number" step="0.1" id="pel_suhu" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="36.5"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">SpO2 (%)</label><input type="number" id="pel_spo2" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="98"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">TB (cm)</label><input type="number" id="pel_tb" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="160"></div>
+                                <div><label class="block text-[10px] md:text-xs font-semibold text-slate-500 mb-1">BB (kg)</label><input type="number" step="0.1" id="pel_bb" class="form-input bg-slate-50 text-xs md:text-sm" placeholder="60.5"></div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <label class="form-label text-base mb-3"><i class="fas fa-vial text-purple-500 mr-2"></i>Pemeriksaan Penunjang / Lab</label>
-                                <textarea id="pel_laborat" rows="4" class="form-input bg-slate-50" placeholder="Hasil GDA, AU, Kolesterol..."></textarea>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                            <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-sm md:text-base mb-2 md:mb-3"><i class="fas fa-vial text-purple-500 mr-2"></i>Pemeriksaan Lab</label>
+                                <textarea id="pel_laborat" rows="3" class="form-input bg-slate-50 text-sm" placeholder="Hasil GDA, AU, Kolesterol..."></textarea>
                             </div>
-                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                                <label class="form-label text-base mb-3"><i class="fas fa-pills text-teal-500 mr-2"></i>Diagnosa & Resep Obat <span class="text-rose-500">*</span></label>
-                                <textarea id="pel_resep" required rows="4" class="form-input font-mono bg-yellow-50 border-yellow-200" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
+                            <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <label class="form-label text-sm md:text-base mb-2 md:mb-3"><i class="fas fa-pills text-teal-500 mr-2"></i>Diagnosa & Resep Obat <span class="text-rose-500">*</span></label>
+                                <textarea id="pel_resep" required rows="3" class="form-input font-mono bg-yellow-50 border-yellow-200 text-sm" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-8 pt-5 border-t border-slate-200 flex justify-end gap-3">
-                        <button type="button" onclick="tutupFormPelayanan()" class="px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">Simpan Draft / Batal</button>
-                        <button type="submit" class="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 transition flex items-center">
-                            <i class="fas fa-paper-plane mr-2"></i> Selesai & Kirim ke Kasir
+                    <div class="mt-6 md:mt-8 pt-4 md:pt-5 border-t border-slate-200 flex flex-col sm:flex-row justify-end gap-3">
+                        <button type="button" onclick="tutupFormPelayanan()" class="w-full sm:w-auto px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">Batal</button>
+                        <button type="submit" class="w-full sm:w-auto px-6 md:px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 transition flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Selesai & Kasir
                         </button>
                     </div>
                 </form>
@@ -322,35 +326,35 @@
     </div>
 
     <!-- MODAL FORM KASIR -->
-    <div id="modalKasir" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-center backdrop-blur-sm">
-        <div id="modalKasirContent" class="bg-white rounded-2xl shadow-2xl p-8 w-[450px] modal-enter border border-slate-100">
-            <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500"><i class="fas fa-cash-register text-lg"></i></div>
-                <h3 class="text-xl font-bold text-slate-800">Pembayaran Kasir</h3>
+    <div id="modalKasir" class="fixed inset-0 bg-slate-900/60 z-[140] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalKasirContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[450px] modal-enter border border-slate-100">
+            <div class="flex items-center gap-3 mb-5 md:mb-6 border-b border-slate-100 pb-3 md:pb-4">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500"><i class="fas fa-cash-register text-base md:text-lg"></i></div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-800">Pembayaran Kasir</h3>
             </div>
             
-            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tagihan Untuk:</p>
-                <p class="font-extrabold text-slate-800 text-lg uppercase" id="info_nama_kasir">-</p>
-                <p class="text-sm font-mono text-orange-600 font-bold mb-4" id="info_erm_kasir">-</p>
+            <div class="bg-slate-50 p-4 md:p-5 rounded-xl border border-slate-200 mb-5 md:mb-6">
+                <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Tagihan Untuk:</p>
+                <p class="font-extrabold text-slate-800 text-base md:text-lg uppercase" id="info_nama_kasir">-</p>
+                <p class="text-xs md:text-sm font-mono text-orange-600 font-bold mb-3 md:mb-4" id="info_erm_kasir">-</p>
                 
-                <div class="pt-4 border-t border-slate-200">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Resep / Tindakan:</p>
-                    <div id="info_resep_kasir" class="bg-white border border-slate-200 rounded-lg p-3 text-sm text-slate-700 font-mono min-h-[60px] whitespace-pre-wrap shadow-inner"></div>
+                <div class="pt-3 md:pt-4 border-t border-slate-200">
+                    <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Rincian Resep / Tindakan:</p>
+                    <div id="info_resep_kasir" class="bg-white border border-slate-200 rounded-lg p-2 md:p-3 text-xs md:text-sm text-slate-700 font-mono min-h-[60px] whitespace-pre-wrap shadow-inner max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 mb-8">
-                <label class="text-sm font-bold text-slate-700">Total Nominal Tagihan (Rp):</label>
-                <input type="number" id="input_tagihan_kasir" placeholder="0" class="form-input text-right font-extrabold text-orange-600 text-2xl py-3 border-orange-300 focus:border-orange-500 focus:ring-orange-500 shadow-inner">
+            <div class="flex flex-col gap-1.5 md:gap-2 mb-6 md:mb-8">
+                <label class="text-xs md:text-sm font-bold text-slate-700">Total Nominal (Rp):</label>
+                <input type="number" id="input_tagihan_kasir" placeholder="0" class="form-input text-right font-extrabold text-orange-600 text-xl md:text-2xl py-2 md:py-3 border-orange-300 focus:border-orange-500 focus:ring-orange-500 shadow-inner">
             </div>
 
-            <div class="flex justify-end gap-3">
-                <button onclick="tutupFormKasir()" class="px-5 py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition w-1/3">Tutup</button>
-                <button id="btnSimpanKasir" onclick="simpanDataKasir()" class="px-5 py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/30 transition flex-1 flex justify-center items-center gap-2">
+            <div class="flex justify-end gap-2 md:gap-3">
+                <button onclick="tutupFormKasir()" class="px-4 md:px-5 py-2 md:py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition w-1/3">Tutup</button>
+                <button id="btnSimpanKasir" onclick="simpanDataKasir()" class="px-4 md:px-5 py-2 md:py-2.5 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/30 transition flex-1 flex justify-center items-center gap-2">
                     <i class="fas fa-check-circle"></i> Selesaikan
                 </button>
-                <button id="btnCetakStruk" onclick="cetakStrukKasir()" class="hidden px-5 py-2.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition flex-1 justify-center items-center gap-2">
+                <button id="btnCetakStruk" onclick="cetakStrukKasir()" class="hidden px-4 md:px-5 py-2 md:py-2.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition flex-1 justify-center items-center gap-2">
                     <i class="fas fa-print"></i> Cetak Struk
                 </button>
             </div>
@@ -359,288 +363,288 @@
 
     <!-- NAVBAR PREMIUM -->
     <nav class="bg-gradient-brand text-white shadow-lg sticky top-0 z-50 border-b border-teal-800/50">
-        <div class="max-w-[1600px] mx-auto flex justify-between items-center px-6">
-            <div class="flex items-center py-3">
+        <!-- FULL WIDTH CONTAINER -->
+        <div class="w-full flex justify-between items-center px-4 md:px-6">
+            <div class="flex items-center py-2 md:py-3 w-full md:w-auto">
                 <!-- LOGO -->
-                <div class="pr-8 border-r border-teal-600/50 cursor-pointer flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-sm">
-                        <i class="fas fa-hospital-user text-xl text-teal-100"></i>
+                <div class="pr-4 md:pr-8 border-r border-teal-600/50 cursor-pointer flex items-center gap-2 md:gap-3 shrink-0">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-sm">
+                        <i class="fas fa-hospital-user text-lg md:text-xl text-teal-100"></i>
                     </div>
-                    <div>
-                        <div class="text-xl font-extrabold tracking-tight leading-none">eRM<span class="font-light text-teal-100">BPM</span></div>
-                        <div class="text-[10px] text-teal-200 font-semibold tracking-widest uppercase mt-0.5">Sistem Klinik</div>
+                    <div class="hidden sm:block">
+                        <div class="text-lg md:text-xl font-extrabold tracking-tight leading-none">eRM<span class="font-light text-teal-100">BPM</span></div>
+                        <div class="text-[9px] md:text-[10px] text-teal-200 font-semibold tracking-widest uppercase mt-0.5">Sistem Klinik</div>
                     </div>
                 </div>
                 
-                <!-- MENU NAVIGATION -->
-                <ul class="flex font-semibold text-[13px] ml-6 gap-2">
-                    <!-- Pendaftaran -->
-                    <li>
-                        <button onclick="switchView('pendaftaran')" class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2.5">
-                            <i class="fas fa-address-card text-teal-200 opacity-90 text-base"></i> <span>Pendaftaran</span>
-                        </button>
-                    </li>
-                    
-                    <!-- Pelayanan Dropdown -->
-                    <li class="relative group">
-                        <button class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2.5 focus:outline-none">
-                            <i class="fas fa-stethoscope text-teal-200 opacity-90 text-base"></i> <span>Pelayanan</span>
-                            <span id="badgePelayanan" class="hidden bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full shadow-sm ml-1 transform scale-90">0</span> 
-                            <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
-                        </button>
+                <!-- MENU NAVIGATION (Scrollable horizontally on mobile) -->
+                <div class="flex-1 overflow-x-auto hide-scrollbar">
+                    <ul class="flex font-semibold text-xs md:text-[13px] ml-2 md:ml-6 gap-1 md:gap-2 w-max">
+                        <!-- Pendaftaran -->
+                        <li>
+                            <button onclick="switchView('pendaftaran')" class="px-3 md:px-5 py-3 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
+                                <i class="fas fa-address-card text-teal-200"></i> <span>Pendaftaran</span>
+                            </button>
+                        </li>
                         
-                        <div class="absolute left-0 top-[100%] pt-2 w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
-                            <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
-                                <li onclick="switchView('pelayanan_medis')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
-                                    <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-blue-600 transition-colors">
-                                        <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-user-md text-base"></i></div>
-                                        <div>Poli Medis <div class="text-[10px] text-slate-400 font-medium leading-tight">Antrean pemeriksaan</div></div>
-                                    </span>
-                                    <span id="badgeDropdownMedis" class="hidden bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
-                                </li>
-                                <li onclick="switchView('pelayanan_kasir')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
-                                    <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-orange-600 transition-colors">
-                                        <div class="w-9 h-9 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover/item:bg-orange-500 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-cash-register text-base"></i></div>
-                                        <div>Kasir Klinik <div class="text-[10px] text-slate-400 font-medium leading-tight">Pembayaran & Struk</div></div>
-                                    </span>
-                                    <span id="badgeDropdownKasir" class="hidden bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    
-                    <!-- Laporan Dropdown -->
-                    <li class="relative group">
-                        <button class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2.5 focus:outline-none">
-                            <i class="fas fa-chart-pie text-teal-200 opacity-90 text-base"></i> <span>Laporan</span>
-                            <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
-                        </button>
+                        <!-- Pelayanan Dropdown -->
+                        <li class="relative group">
+                            <button class="px-3 md:px-5 py-3 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
+                                <i class="fas fa-stethoscope text-teal-200"></i> <span>Pelayanan</span>
+                                <span id="badgePelayanan" class="hidden bg-rose-500 text-white text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full shadow-sm">0</span> 
+                                <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
+                            </button>
+                            
+                            <div class="absolute left-0 top-[100%] pt-2 w-56 md:w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                                <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
+                                    <li onclick="switchView('pelayanan_medis')" class="p-2 md:p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
+                                        <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-blue-600 transition-colors">
+                                            <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-user-md"></i></div>
+                                            <div>Poli Medis <div class="text-[9px] md:text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Antrean pemeriksaan</div></div>
+                                        </span>
+                                        <span id="badgeDropdownMedis" class="hidden bg-rose-500 text-white text-[9px] md:text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
+                                    </li>
+                                    <li onclick="switchView('pelayanan_kasir')" class="p-2 md:p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center justify-between group/item">
+                                        <span class="flex items-center gap-3 font-bold text-slate-700 group-hover/item:text-orange-600 transition-colors">
+                                            <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover/item:bg-orange-500 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-cash-register"></i></div>
+                                            <div>Kasir Klinik <div class="text-[9px] md:text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Pembayaran & Struk</div></div>
+                                        </span>
+                                        <span id="badgeDropdownKasir" class="hidden bg-orange-500 text-white text-[9px] md:text-[10px] px-2 py-0.5 rounded-full shadow-sm">0</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         
-                        <div class="absolute left-0 top-[100%] pt-2 w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
-                            <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
-                                <li onclick="switchView('laporan_kunjungan')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
-                                    <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover/item:bg-teal-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-users text-base"></i></div>
-                                    <div><span class="font-bold text-slate-700 group-hover/item:text-teal-700 transition-colors">Kunjungan Pasien</span><div class="text-[10px] text-slate-400 font-medium leading-tight">Histori pendaftaran</div></div>
-                                </li>
-                                <li onclick="switchView('laporan_keuangan')" class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
-                                    <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-file-invoice-dollar text-base"></i></div>
-                                    <div><span class="font-bold text-slate-700 group-hover/item:text-emerald-700 transition-colors">Pendapatan Klinik</span><div class="text-[10px] text-slate-400 font-medium leading-tight">Laporan keuangan</div></div>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                        <!-- Laporan Dropdown -->
+                        <li class="relative group">
+                            <button class="px-3 md:px-5 py-3 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
+                                <i class="fas fa-chart-pie text-teal-200"></i> <span>Laporan</span>
+                                <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
+                            </button>
+                            
+                            <div class="absolute left-0 md:left-auto md:right-0 top-[100%] pt-2 w-56 md:w-64 invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                                <ul class="bg-white text-slate-700 shadow-2xl rounded-2xl border border-slate-100 overflow-hidden p-2 flex flex-col gap-1">
+                                    <li onclick="switchView('laporan_kunjungan')" class="p-2 md:p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center group-hover/item:bg-teal-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-users"></i></div>
+                                        <div><span class="font-bold text-slate-700 group-hover/item:text-teal-700 transition-colors">Kunjungan Pasien</span><div class="text-[9px] md:text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Histori pendaftaran</div></div>
+                                    </li>
+                                    <li onclick="switchView('laporan_keuangan')" class="p-2 md:p-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors flex items-center gap-3 group/item">
+                                        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors shadow-sm"><i class="fas fa-file-invoice-dollar"></i></div>
+                                        <div><span class="font-bold text-slate-700 group-hover/item:text-emerald-700 transition-colors">Pendapatan Klinik</span><div class="text-[9px] md:text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Laporan keuangan</div></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
 
-                    <!-- Pengaturan -->
-                    <li>
-                        <button onclick="switchView('pengaturan')" class="px-5 py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2.5">
-                            <i class="fas fa-cog text-teal-200 opacity-90 text-base"></i> <span>Pengaturan</span>
-                        </button>
-                    </li>
-                </ul>
+                        <!-- Pengaturan -->
+                        <li>
+                            <button onclick="switchView('pengaturan')" class="px-3 md:px-5 py-3 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
+                                <i class="fas fa-cog text-teal-200"></i> <span class="hidden sm:inline">Pengaturan</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors border border-white/20 shadow-inner"><i class="fas fa-bell text-sm"></i></div>
+            <div class="hidden lg:flex items-center gap-4 shrink-0 pl-2">
+                <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors border border-white/20 shadow-inner"><i class="fas fa-bell text-sm"></i></div>
                 <div class="flex items-center gap-2 bg-slate-900/30 px-3 py-1.5 rounded-full text-xs font-semibold shadow-inner border border-slate-900/20">
-                    <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span></span>
+                    <span class="relative flex h-2 w-2 md:h-2.5 md:w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-green-500"></span></span>
                     Online Server
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="p-6 max-w-[1600px] mx-auto z-10">
+    <!-- FULL WIDTH MAIN CONTAINER -->
+    <main class="p-4 md:p-6 w-full z-10">
         
         <!-- ================= VIEW PENDAFTARAN ================= -->
-        <div id="view-pendaftaran" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden block transition-all duration-300">
-            <div class="px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-slate-100 bg-slate-50/50">
-                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-users"></i></div>
+        <div id="view-pendaftaran" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden block transition-all duration-300 w-full">
+            <div class="px-4 md:px-6 py-4 md:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 bg-slate-50/50">
+                <h1 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-users"></i></div>
                     Master Data Pasien
                 </h1>
-                <div class="flex gap-3 w-full md:w-auto">
-                    <div class="relative flex-1 md:w-64">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="searchInput" onkeyup="renderTabel(patientsData)" placeholder="Cari Nama / No. eRM..." class="pl-9 pr-3 py-2 w-full border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-white shadow-sm">
+                <div class="flex flex-wrap sm:flex-nowrap gap-2 md:gap-3 w-full sm:w-auto">
+                    <div class="relative flex-1 min-w-[200px] sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-2 md:top-2.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" onkeyup="renderTabel(patientsData)" placeholder="Cari Nama / eRM..." class="pl-9 pr-3 py-1.5 md:py-2 w-full border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 bg-white shadow-sm">
                     </div>
-                    <button onclick="fetchDataDariSpreadsheet()" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 transition shadow-sm"><i class="fas fa-sync-alt"></i></button>
-                    <button onclick="bukaFormBaru()" class="bg-gradient-brand text-white px-5 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 transition flex items-center gap-2">
+                    <button onclick="fetchDataDariSpreadsheet()" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50 transition shadow-sm" title="Sinkronisasi Data"><i class="fas fa-sync-alt"></i></button>
+                    <button onclick="bukaFormBaru()" class="flex-1 sm:flex-none bg-gradient-brand text-white px-4 md:px-5 py-1.5 md:py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-teal-500/30 transform hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
                         <i class="fas fa-plus"></i> Pasien Baru
                     </button>
                 </div>
             </div>
             
             <div class="table-container p-2 min-h-[500px]">
-                <table class="w-full text-left whitespace-nowrap">
+                <table class="w-full text-left whitespace-nowrap min-w-[800px]">
                     <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 rounded-lg">
                         <tr>
-                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
-                            <th class="p-4 text-center w-[140px]">Tindakan</th>
-                            <th class="p-4">No. eRM</th>
-                            <th class="p-4">Nama Lengkap</th>
-                            <th class="p-4">L/P</th>
-                            <th class="p-4">Usia / TTL</th>
-                            <th class="p-4 rounded-tr-lg">Alamat</th>
+                            <th class="p-3 md:p-4 rounded-tl-lg text-center w-10 md:w-12">#</th>
+                            <th class="p-3 md:p-4 text-center w-[120px] md:w-[140px]">Tindakan</th>
+                            <th class="p-3 md:p-4">No. eRM</th>
+                            <th class="p-3 md:p-4">Nama Lengkap</th>
+                            <th class="p-3 md:p-4">L/P</th>
+                            <th class="p-3 md:p-4">Usia / TTL</th>
+                            <th class="p-3 md:p-4 rounded-tr-lg">Alamat</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                    <tbody id="tableBody" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- ================= VIEW PELAYANAN MEDIS ================= -->
-        <div id="view-pelayanan-medis" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
-            <div class="bg-blue-50 border-b border-blue-100 px-6 py-5 flex justify-between items-center">
-                <h1 class="text-xl font-bold text-blue-800 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white text-blue-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-user-md"></i></div>
+        <div id="view-pelayanan-medis" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-blue-50 border-b border-blue-100 px-4 md:px-6 py-4 md:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h1 class="text-lg md:text-xl font-bold text-blue-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white text-blue-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-user-md"></i></div>
                     Antrean Poli Medis
                 </h1>
-                <div class="flex items-center gap-3 bg-white p-1.5 rounded-lg border border-blue-200 shadow-sm">
-                    <label class="text-xs font-bold text-blue-800 px-3 uppercase tracking-wider"><i class="far fa-calendar-alt mr-1"></i> Tanggal:</label>
-                    <input type="date" id="filter_tgl_medis" onchange="renderTabelPelayananMedis()" class="form-input py-1.5 px-2 text-sm font-semibold text-blue-700 border-none focus:ring-0 cursor-pointer w-auto bg-blue-50/30 rounded-md">
+                <div class="flex items-center gap-2 md:gap-3 bg-white p-1 md:p-1.5 rounded-lg border border-blue-200 shadow-sm w-full sm:w-auto overflow-hidden">
+                    <label class="text-[10px] md:text-xs font-bold text-blue-800 px-2 uppercase tracking-wider shrink-0"><i class="far fa-calendar-alt mr-1"></i> Tanggal:</label>
+                    <input type="date" id="filter_tgl_medis" onchange="renderTabelPelayananMedis()" class="form-input py-1 md:py-1.5 px-2 text-xs md:text-sm font-semibold text-blue-700 border-none focus:ring-0 cursor-pointer w-full sm:w-auto bg-blue-50/30 rounded-md">
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
-                <table class="w-full text-left whitespace-nowrap">
+                <table class="w-full text-left whitespace-nowrap min-w-[700px]">
                     <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
                         <tr>
-                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
-                            <th class="p-4">No. eRM</th>
-                            <th class="p-4">Nama Pasien</th>
-                            <th class="p-4">Waktu Daftar</th>
-                            <th class="p-4 rounded-tr-lg text-center w-48">Pemeriksaan</th>
+                            <th class="p-3 md:p-4 rounded-tl-lg text-center w-10 md:w-12">#</th>
+                            <th class="p-3 md:p-4">No. eRM</th>
+                            <th class="p-3 md:p-4">Nama Pasien</th>
+                            <th class="p-3 md:p-4">Waktu Daftar</th>
+                            <th class="p-3 md:p-4 rounded-tr-lg text-center w-36 md:w-48">Pemeriksaan</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBodyPelayananMedis" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                    <tbody id="tableBodyPelayananMedis" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- ================= VIEW PELAYANAN KASIR ================= -->
-        <div id="view-pelayanan-kasir" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
-            <div class="bg-orange-50 border-b border-orange-100 px-6 py-5 flex justify-between items-center">
-                <h1 class="text-xl font-bold text-orange-800 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white text-orange-500 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-calculator"></i></div>
+        <div id="view-pelayanan-kasir" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-orange-50 border-b border-orange-100 px-4 md:px-6 py-4 md:py-5 flex items-center justify-between">
+                <h1 class="text-lg md:text-xl font-bold text-orange-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white text-orange-500 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-calculator"></i></div>
                     Antrean Kasir
                 </h1>
             </div>
             <div class="table-container p-2 min-h-[400px]">
-                <table class="w-full text-left whitespace-nowrap">
+                <table class="w-full text-left whitespace-nowrap min-w-[700px]">
                     <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
                         <tr>
-                            <th class="p-4 rounded-tl-lg text-center w-12">#</th>
-                            <th class="p-4">No. eRM</th>
-                            <th class="p-4">Nama Pasien</th>
-                            <th class="p-4">Waktu Medis</th>
-                            <th class="p-4 rounded-tr-lg text-center w-48">Pembayaran</th>
+                            <th class="p-3 md:p-4 rounded-tl-lg text-center w-10 md:w-12">#</th>
+                            <th class="p-3 md:p-4">No. eRM</th>
+                            <th class="p-3 md:p-4">Nama Pasien</th>
+                            <th class="p-3 md:p-4">Waktu Medis</th>
+                            <th class="p-3 md:p-4 rounded-tr-lg text-center w-36 md:w-48">Pembayaran</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBodyPelayananKasir" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                    <tbody id="tableBodyPelayananKasir" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- ================= VIEW LAPORAN ================= -->
-        <div id="view-laporan-kunjungan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
-            <div class="bg-teal-50 border-b border-teal-100 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 class="text-xl font-bold text-teal-800 flex items-center gap-3"><div class="w-10 h-10 bg-white text-teal-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-users"></i></div>Laporan Kunjungan</h1>
-                <div class="flex flex-wrap gap-3 items-center">
-                    <select id="filter_waktu_kunjungan" onchange="toggleCustomDate('kunjungan'); renderLaporanKunjungan()" class="form-input w-auto font-semibold text-teal-700 bg-white border-teal-200 shadow-sm">
-                        <option value="hari_ini">Hari Ini</option>
-                        <option value="minggu_ini">Minggu Ini</option>
-                        <option value="bulan_ini">Bulan Ini</option>
-                        <option value="semua">Semua Waktu</option>
-                        <option value="rentang">Rentang Waktu</option>
-                    </select>
-                    <div id="custom_date_kunjungan" class="hidden flex items-center gap-2 bg-white border border-teal-200 p-1 rounded-lg shadow-sm">
-                        <label class="text-xs font-bold text-slate-500 pl-2">Mulai:</label>
-                        <input type="date" id="kunjungan_start" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
-                        <label class="text-xs font-bold text-slate-500 border-l border-teal-100 pl-2">Sampai:</label>
-                        <input type="date" id="kunjungan_end" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
+        <div id="view-laporan-kunjungan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-teal-50 border-b border-teal-100 px-4 md:px-6 py-4 md:py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h1 class="text-lg md:text-xl font-bold text-teal-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 md:w-10 md:h-10 bg-white text-teal-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-users"></i></div>Laporan Kunjungan</h1>
+                <div class="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 items-center w-full md:w-auto">
+                    <!-- Filter Dates Only -->
+                    <div id="custom_date_kunjungan" class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-white border border-teal-200 p-1.5 md:p-1 rounded-lg shadow-sm w-full sm:w-auto">
+                        <div class="flex items-center w-full sm:w-auto">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 pl-1 md:pl-2 w-12 sm:w-auto">Mulai:</label>
+                            <input type="date" id="kunjungan_start" class="form-input text-xs py-1 w-full sm:w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
+                        </div>
+                        <div class="flex items-center w-full sm:w-auto sm:border-l border-teal-100 sm:pl-2">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 pl-1 sm:pl-0 w-12 sm:w-auto">Sampai:</label>
+                            <input type="date" id="kunjungan_end" class="form-input text-xs py-1 w-full sm:w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKunjungan()">
+                        </div>
                     </div>
-                    <button onclick="downloadLaporan('kunjungan')" class="bg-teal-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-teal-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
-                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
+                    <button onclick="downloadLaporan('kunjungan')" class="flex-1 sm:flex-none bg-teal-600 text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-teal-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center justify-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
-                <table class="w-full text-left whitespace-nowrap"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-4 text-center w-12">#</th><th class="p-4">Waktu</th><th class="p-4">eRM</th><th class="p-4">Pasien</th><th class="p-4">L/P</th><th class="p-4">Alamat</th><th class="p-4">Status</th></tr></thead><tbody id="tableBodyLaporanKunjungan" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody></table>
+                <table class="w-full text-left whitespace-nowrap min-w-[800px]"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-3 md:p-4 text-center w-10 md:w-12">#</th><th class="p-3 md:p-4">Waktu</th><th class="p-3 md:p-4">eRM</th><th class="p-3 md:p-4">Pasien</th><th class="p-3 md:p-4">L/P</th><th class="p-3 md:p-4">Alamat</th><th class="p-3 md:p-4">Status</th></tr></thead><tbody id="tableBodyLaporanKunjungan" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody></table>
             </div>
         </div>
 
-        <div id="view-laporan-keuangan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
-            <div class="bg-emerald-50 border-b border-emerald-100 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 class="text-xl font-bold text-emerald-800 flex items-center gap-3"><div class="w-10 h-10 bg-white text-emerald-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Laporan Pendapatan</h1>
-                <div class="flex flex-wrap gap-3 items-center">
-                    <select id="filter_waktu_keuangan" onchange="toggleCustomDate('keuangan'); renderLaporanKeuangan()" class="form-input w-auto font-semibold text-emerald-700 bg-white border-emerald-200 shadow-sm">
-                        <option value="hari_ini">Hari Ini</option>
-                        <option value="minggu_ini">Minggu Ini</option>
-                        <option value="bulan_ini">Bulan Ini</option>
-                        <option value="semua">Semua Waktu</option>
-                        <option value="rentang">Rentang Waktu</option>
-                    </select>
-                    <div id="custom_date_keuangan" class="hidden flex items-center gap-2 bg-white border border-emerald-200 p-1 rounded-lg shadow-sm">
-                        <label class="text-xs font-bold text-slate-500 pl-2">Mulai:</label>
-                        <input type="date" id="keuangan_start" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
-                        <label class="text-xs font-bold text-slate-500 border-l border-emerald-100 pl-2">Sampai:</label>
-                        <input type="date" id="keuangan_end" class="form-input text-xs py-1 w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
+        <div id="view-laporan-keuangan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-emerald-50 border-b border-emerald-100 px-4 md:px-6 py-4 md:py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h1 class="text-lg md:text-xl font-bold text-emerald-800 flex items-center gap-3 shrink-0"><div class="w-8 h-8 md:w-10 md:h-10 bg-white text-emerald-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-file-invoice-dollar"></i></div>Laporan Pendapatan</h1>
+                <div class="flex flex-wrap md:flex-nowrap gap-2 md:gap-3 items-center w-full md:w-auto">
+                    <!-- Filter Dates Only -->
+                    <div id="custom_date_keuangan" class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 bg-white border border-emerald-200 p-1.5 md:p-1 rounded-lg shadow-sm w-full sm:w-auto">
+                        <div class="flex items-center w-full sm:w-auto">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 pl-1 md:pl-2 w-12 sm:w-auto">Mulai:</label>
+                            <input type="date" id="keuangan_start" class="form-input text-xs py-1 w-full sm:w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
+                        </div>
+                        <div class="flex items-center w-full sm:w-auto sm:border-l border-emerald-100 sm:pl-2">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 pl-1 sm:pl-0 w-12 sm:w-auto">Sampai:</label>
+                            <input type="date" id="keuangan_end" class="form-input text-xs py-1 w-full sm:w-auto border-none focus:ring-0 bg-transparent" onchange="renderLaporanKeuangan()">
+                        </div>
                     </div>
-                    <button onclick="downloadLaporan('keuangan')" class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-bold shadow-sm hover:bg-emerald-700 flex items-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
-                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
+                    <button onclick="downloadLaporan('keuangan')" class="flex-1 sm:flex-none bg-emerald-600 text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-emerald-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
+                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center justify-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
-                <table class="w-full text-left whitespace-nowrap"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-4 text-center w-12">#</th><th class="p-4">Waktu Lunas</th><th class="p-4">eRM</th><th class="p-4">Pasien</th><th class="p-4 text-right">Nominal (Rp)</th></tr></thead><tbody id="tableBodyLaporanKeuangan" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody><tfoot id="tfootLaporanKeuangan" class="bg-emerald-50 font-bold text-emerald-800 text-base"></tfoot></table>
+                <table class="w-full text-left whitespace-nowrap min-w-[700px]"><thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50"><tr><th class="p-3 md:p-4 text-center w-10 md:w-12">#</th><th class="p-3 md:p-4">Waktu Lunas</th><th class="p-3 md:p-4">eRM</th><th class="p-3 md:p-4">Pasien</th><th class="p-3 md:p-4 text-right">Nominal (Rp)</th></tr></thead><tbody id="tableBodyLaporanKeuangan" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody><tfoot id="tfootLaporanKeuangan" class="bg-emerald-50 font-bold text-emerald-800 text-sm md:text-base"></tfoot></table>
             </div>
         </div>
 
         <!-- ================= VIEW PENGATURAN ================= -->
-        <div id="view-pengaturan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300">
-            <div class="bg-slate-50 border-b border-slate-200 px-6 py-5 flex justify-between items-center">
-                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white text-slate-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-cog"></i></div>
+        <div id="view-pengaturan" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-slate-50 border-b border-slate-200 px-4 md:px-6 py-4 md:py-5 flex justify-between items-center">
+                <h1 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white text-slate-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-cog"></i></div>
                     Pengaturan Sistem
                 </h1>
-                <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2"><i class="fas fa-lock"></i> Kunci Akses</button>
+                <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2"><i class="fas fa-lock"></i> <span class="hidden sm:inline">Kunci Akses</span></button>
             </div>
             
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 <!-- PENGATURAN STRUK -->
-                <div class="border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div class="border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm">
                     <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-print text-blue-500 mr-2"></i> Pengaturan Struk Kasir</h3>
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="form-label">Nama / Kop Klinik</label>
+                            <label class="form-label text-xs md:text-sm">Nama / Kop Klinik</label>
                             <input type="text" id="set_struk_kop" class="form-input font-bold text-slate-800" value="eRM BPM CLINIC">
                         </div>
                         <div>
-                            <label class="form-label">Alamat / Baris 2 Kop</label>
+                            <label class="form-label text-xs md:text-sm">Alamat / Baris 2 Kop</label>
                             <input type="text" id="set_struk_alamat" class="form-input text-slate-600" value="Struk Resmi">
                         </div>
                         <div>
-                            <label class="form-label">Pesan Bawah (Footer)</label>
+                            <label class="form-label text-xs md:text-sm">Pesan Bawah (Footer)</label>
                             <textarea id="set_struk_footer" rows="2" class="form-input text-slate-600">Terima Kasih, Semoga Lekas Sembuh</textarea>
                         </div>
                         <div class="pt-2">
-                            <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">Simpan Template Struk</button>
+                            <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white text-sm md:text-base font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">Simpan Template Struk</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- PENGATURAN PASSWORD -->
-                <div class="border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <div class="border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm">
                     <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-shield-alt text-rose-500 mr-2"></i> Pengaturan Keamanan</h3>
                     
                     <div class="space-y-4">
-                        <div class="bg-rose-50 p-4 rounded-xl border border-rose-100 mb-4">
-                            <p class="text-xs text-rose-700 font-medium">Password ini digunakan untuk mengunci akses ke menu Laporan dan Pengaturan agar tidak bisa diubah oleh sembarang orang. <br><br><b>Password bawaan: admin</b></p>
+                        <div class="bg-rose-50 p-3 md:p-4 rounded-xl border border-rose-100 mb-4">
+                            <p class="text-[10px] md:text-xs text-rose-700 font-medium leading-relaxed">Password ini digunakan untuk mengunci akses ke menu Laporan dan Pengaturan agar tidak bisa diubah oleh sembarang orang. <br><br><b>Password bawaan: admin</b></p>
                         </div>
                         <div>
-                            <label class="form-label">Password Baru</label>
+                            <label class="form-label text-xs md:text-sm">Password Baru</label>
                             <input type="password" id="set_pass_baru" class="form-input tracking-widest font-bold text-center" placeholder="••••••••">
                         </div>
                         <div class="pt-2">
-                            <button onclick="simpanPengaturanPassword()" class="w-full py-2.5 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 shadow-md transition-all">Ganti Password Akses</button>
+                            <button onclick="simpanPengaturanPassword()" class="w-full py-2.5 bg-rose-500 text-white text-sm md:text-base font-bold rounded-xl hover:bg-rose-600 shadow-md transition-all">Ganti Password Akses</button>
                         </div>
                     </div>
                 </div>
@@ -695,8 +699,8 @@
                 default: bgClass = 'bg-slate-800'; iconClass = 'fa-info-circle text-slate-300';
             }
 
-            toast.className = `${bgClass} text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 toast-enter text-sm font-semibold border border-white/10`;
-            toast.innerHTML = `<i class="fas ${iconClass} text-lg"></i> <span>${message}</span>`;
+            toast.className = `${bgClass} text-white px-4 md:px-5 py-3 md:py-3.5 rounded-xl shadow-xl flex items-center gap-3 toast-enter text-xs md:text-sm font-semibold border border-white/10`;
+            toast.innerHTML = `<i class="fas ${iconClass} text-base md:text-lg"></i> <span>${message}</span>`;
             
             container.appendChild(toast);
             requestAnimationFrame(() => { toast.classList.remove('toast-enter'); toast.classList.add('toast-enter-active'); });
@@ -861,7 +865,7 @@
             document.getElementById('form_tgl_bulan').value = '';
             document.getElementById('form_tgl_tahun').value = '';
             document.getElementById('form_erm').value = "P" + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
-            document.getElementById('titleModalPasien').innerHTML = '<div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>Pendaftaran Pasien Baru';
+            document.getElementById('titleModalPasien').innerHTML = '<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>Pendaftaran Pasien Baru';
             hitungUmur(); tampilModal('modalBuatBaru', 'modalContent');
         }
 
@@ -871,7 +875,7 @@
             if(idx === -1) return;
             editPasienIndex = idx; const p = patientsData[idx];
             
-            document.getElementById('titleModalPasien').innerHTML = '<div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600"><i class="fas fa-edit"></i></div>Edit Data Pasien';
+            document.getElementById('titleModalPasien').innerHTML = '<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600"><i class="fas fa-edit"></i></div>Edit Data Pasien';
             document.getElementById('form_erm').value = p.erm;
             document.getElementById('form_nama').value = p.nama;
             document.getElementById('form_status_kk').value = p.status_kk || '';
@@ -964,7 +968,7 @@
             filteredData.forEach((row, index) => {
                 const tr = document.createElement('tr'); tr.className = "hover:bg-teal-50/30 transition-colors";
                 let nm = `<span class="font-bold text-slate-700">${row.nama}</span>`;
-                if(row.tag==='Baru') nm += `<span class="ml-2 bg-teal-100 text-teal-700 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
+                if(row.tag==='Baru') nm += `<span class="ml-2 md:ml-3 bg-teal-100 text-teal-700 text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
                 
                 let thn = "0";
                 if(row.tglLahirRaw) { const d=new Date(row.tglLahirRaw); thn = new Date().getFullYear() - d.getFullYear(); }
@@ -975,19 +979,19 @@
                 }
 
                 tr.innerHTML = `
-                    <td class="p-4 text-center text-slate-400 font-medium">${index + 1}</td>
-                    <td class="p-4 text-center">
-                        <div class="flex justify-center gap-1.5">
-                            <button onclick="bukaKonfirmasi('${row.erm}')" class="w-8 h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Daftar Pelayanan"><i class="fas fa-stethoscope text-sm"></i></button>
-                            <button onclick="editPasien('${row.erm}')" class="w-8 h-8 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Edit Data"><i class="fas fa-edit text-sm"></i></button>
-                            <button onclick="bukaRiwayatLengkap('${row.erm}')" class="w-8 h-8 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Riwayat Medis"><i class="fas fa-history text-sm"></i></button>
+                    <td class="p-3 md:p-4 text-center text-slate-400 font-medium">${index + 1}</td>
+                    <td class="p-3 md:p-4 text-center">
+                        <div class="flex justify-center gap-1 md:gap-1.5">
+                            <button onclick="bukaKonfirmasi('${row.erm}')" class="w-7 h-7 md:w-8 md:h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Daftar Pelayanan"><i class="fas fa-stethoscope text-xs md:text-sm"></i></button>
+                            <button onclick="editPasien('${row.erm}')" class="w-7 h-7 md:w-8 md:h-8 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Edit Data"><i class="fas fa-edit text-xs md:text-sm"></i></button>
+                            <button onclick="bukaRiwayatLengkap('${row.erm}')" class="w-7 h-7 md:w-8 md:h-8 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition-colors flex items-center justify-center" title="Riwayat Medis"><i class="fas fa-history text-xs md:text-sm"></i></button>
                         </div>
                     </td>
-                    <td class="p-4 font-mono font-semibold text-slate-500">${row.erm}</td>
-                    <td class="p-4">${nm}</td>
-                    <td class="p-4 font-medium ${row.jk==='Laki-laki'?'text-blue-600':'text-pink-600'}">${row.jk === 'Laki-laki' ? 'L' : (row.jk === 'Perempuan' ? 'P' : '-')}</td>
-                    <td class="p-4 text-xs"><span class="font-bold text-slate-700">${thn} Thn</span><br><span class="text-slate-400">${row.ttl}</span></td>
-                    <td class="p-4 text-xs text-slate-500 truncate max-w-[200px]" title="${almtDisplay}">${almtDisplay}</td>
+                    <td class="p-3 md:p-4 font-mono font-semibold text-slate-500">${row.erm}</td>
+                    <td class="p-3 md:p-4">${nm}</td>
+                    <td class="p-3 md:p-4 font-medium ${row.jk==='Laki-laki'?'text-blue-600':'text-pink-600'}">${row.jk === 'Laki-laki' ? 'L' : (row.jk === 'Perempuan' ? 'P' : '-')}</td>
+                    <td class="p-3 md:p-4 text-[10px] md:text-xs"><span class="font-bold text-slate-700">${thn} Thn</span><br><span class="text-slate-400">${row.ttl}</span></td>
+                    <td class="p-3 md:p-4 text-[10px] md:text-xs text-slate-500 truncate max-w-[150px] md:max-w-[200px]" title="${almtDisplay}">${almtDisplay}</td>
                 `;
                 tb.appendChild(tr);
             });
@@ -1049,7 +1053,7 @@
             if(hist.length === 0) tb.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">Belum ada riwayat kunjungan pelayanan medis.</td></tr>`;
             else {
                 hist.reverse().forEach(h => {
-                    tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-4 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-xs text-slate-400 font-mono">${h.jam}</span></td><td class="p-4 align-top font-medium text-slate-600">${h.keluhan||'-'}</td><td class="p-4 align-top text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block">S: ${h.suhu?h.suhu+'°C':'-'}</span></td><td class="p-4 align-top font-mono text-xs text-teal-700 bg-teal-50/30 whitespace-pre-wrap rounded-r-lg">${h.resep||'-'}</td></tr>`;
+                    tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-3 md:p-4 align-top"><span class="font-bold text-slate-700">${h.tgl}</span><br><span class="text-[10px] md:text-xs text-slate-400 font-mono">${h.jam}</span></td><td class="p-3 md:p-4 align-top font-medium text-slate-600">${h.keluhan||'-'}</td><td class="p-3 md:p-4 align-top text-[10px] md:text-xs text-slate-500"><span class="font-mono bg-slate-100 px-1 rounded">TD: ${h.td||'-'}</span><br><span class="font-mono bg-slate-100 px-1 rounded mt-1 inline-block">S: ${h.suhu?h.suhu+'°C':'-'}</span></td><td class="p-3 md:p-4 align-top font-mono text-[10px] md:text-xs text-teal-700 bg-teal-50/30 whitespace-pre-wrap rounded-r-lg">${h.resep||'-'}</td></tr>`;
                 });
             }
             tampilModal('modalRiwayat', 'modalRiwayatContent');
@@ -1128,10 +1132,10 @@
                 tr.className = blm ? "bg-yellow-100 hover:bg-yellow-200 transition-colors" : "bg-green-100 hover:bg-green-200 transition-colors";
                 
                 let btn = blm 
-                    ? `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm w-full transition-transform transform hover:scale-105"><i class="fas fa-stethoscope mr-2"></i> Periksa</button>`
-                    : `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-white border border-green-400 text-green-700 hover:bg-green-50 text-xs font-bold px-4 py-2 rounded-lg w-full transition-colors shadow-sm"><i class="fas fa-edit mr-2"></i> Edit Hasil</button>`;
+                    ? `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-sm w-full transition-transform transform hover:scale-105"><i class="fas fa-stethoscope mr-1 md:mr-2"></i> Periksa</button>`
+                    : `<button onclick="bukaFormPelayanan('${row.erm}')" class="bg-white border border-green-400 text-green-700 hover:bg-green-50 text-xs md:text-sm font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg w-full transition-colors shadow-sm"><i class="fas fa-edit mr-1 md:mr-2"></i> Edit Hasil</button>`;
 
-                tr.innerHTML = `<td class="p-4 text-center font-bold text-slate-700">${idx+1}</td><td class="p-4 font-mono font-semibold text-slate-700">${row.erm}</td><td class="p-4 font-bold text-slate-900 uppercase">${row.nama}</td><td class="p-4 text-slate-600 font-medium"><i class="far fa-clock mr-1"></i> ${row.waktuDaftar}</td><td class="p-4 text-center px-4">${btn}</td>`;
+                tr.innerHTML = `<td class="p-3 md:p-4 text-center font-bold text-slate-700">${idx+1}</td><td class="p-3 md:p-4 font-mono font-semibold text-slate-700">${row.erm}</td><td class="p-3 md:p-4 font-bold text-slate-900 uppercase">${row.nama}</td><td class="p-3 md:p-4 text-slate-600 font-medium"><i class="far fa-clock mr-1"></i> ${row.waktuDaftar}</td><td class="p-3 md:p-4 text-center px-4">${btn}</td>`;
                 tb.appendChild(tr);
             });
         }
@@ -1190,10 +1194,10 @@
                 tr.className = "hover:bg-orange-50/30 transition-colors border-b border-slate-100";
                 
                 let btn = lunas 
-                    ? `<button onclick="bukaFormKasir('${row.erm}')" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg w-full transition flex justify-center items-center"><i class="fas fa-print mr-2"></i> Cetak</button>`
-                    : `<button onclick="bukaFormKasir('${row.erm}')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm w-full transition transform hover:scale-105 flex justify-center items-center"><i class="fas fa-wallet mr-2"></i> Bayar</button>`;
+                    ? `<button onclick="bukaFormKasir('${row.erm}')" class="bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg w-full transition flex justify-center items-center"><i class="fas fa-print mr-1 md:mr-2"></i> Cetak</button>`
+                    : `<button onclick="bukaFormKasir('${row.erm}')" class="bg-orange-500 hover:bg-orange-600 text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-sm w-full transition transform hover:scale-105 flex justify-center items-center"><i class="fas fa-wallet mr-1 md:mr-2"></i> Bayar</button>`;
 
-                tr.innerHTML = `<td class="p-4 text-center font-bold text-slate-500">${idx+1}</td><td class="p-4 font-mono font-semibold text-slate-600">${row.erm}</td><td class="p-4 font-bold text-slate-800 uppercase ${lunas?'opacity-50':''}">${row.nama}</td><td class="p-4 text-orange-600 font-medium"><i class="far fa-check-circle mr-1"></i> ${row.waktuMedisSelesai||'-'}</td><td class="p-4 text-center px-4">${btn}</td>`;
+                tr.innerHTML = `<td class="p-3 md:p-4 text-center font-bold text-slate-500">${idx+1}</td><td class="p-3 md:p-4 font-mono font-semibold text-slate-600">${row.erm}</td><td class="p-3 md:p-4 font-bold text-slate-800 uppercase ${lunas?'opacity-50':''}">${row.nama}</td><td class="p-3 md:p-4 text-orange-600 font-medium"><i class="far fa-check-circle mr-1"></i> ${row.waktuMedisSelesai||'-'}</td><td class="p-3 md:p-4 text-center px-4">${btn}</td>`;
                 tb.appendChild(tr);
             });
         }
@@ -1251,79 +1255,54 @@
             pw.document.close(); pw.focus(); setTimeout(() => { pw.print(); }, 500);
         }
 
-        // --- LAPORAN ---
-        function toggleCustomDate(type) {
-            const selectVal = document.getElementById(`filter_waktu_${type}`).value;
-            const customDiv = document.getElementById(`custom_date_${type}`);
-            if (selectVal === 'rentang') {
-                customDiv.classList.remove('hidden');
-            } else {
-                customDiv.classList.add('hidden');
-            }
-        }
-
-        function filterDataByDate(arr, type, startId, endId) {
-            const n = new Date();
-            const tdy = new Date(n.getFullYear(), n.getMonth(), n.getDate());
-            const wk = new Date(tdy); wk.setDate(n.getDate() - n.getDay()); 
-            const mo = new Date(n.getFullYear(), n.getMonth(), 1);
-            
+        // --- LAPORAN DENGAN RENTANG WAKTU DEFAULT ---
+        function filterDataByDate(arr, startId, endId) {
             return arr.filter(i => { 
                 if(!i.tanggalSistem) return false; 
                 const d = new Date(i.tanggalSistem); 
-                const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-                if (type === 'hari_ini') return dOnly.getTime() === tdy.getTime(); 
-                if (type === 'minggu_ini') return d >= wk; 
-                if (type === 'bulan_ini') return d >= mo; 
-                if (type === 'rentang') {
-                    const startStr = document.getElementById(startId).value;
-                    const endStr = document.getElementById(endId).value;
-                    if(!startStr || !endStr) return true; 
-                    
-                    const start = new Date(startStr); start.setHours(0,0,0,0);
-                    const end = new Date(endStr); end.setHours(23,59,59,999);
-                    return d >= start && d <= end;
-                }
-                return true; 
+                
+                const startStr = document.getElementById(startId).value;
+                const endStr = document.getElementById(endId).value;
+                if(!startStr || !endStr) return true; 
+                
+                const start = new Date(startStr); start.setHours(0,0,0,0);
+                const end = new Date(endStr); end.setHours(23,59,59,999);
+                return d >= start && d <= end;
             });
         }
         
         function renderLaporanKunjungan() {
-            const filterType = document.getElementById('filter_waktu_kunjungan').value;
-            const fd = filterDataByDate(pelayananData, filterType, 'kunjungan_start', 'kunjungan_end'); 
+            const fd = filterDataByDate(pelayananData, 'kunjungan_start', 'kunjungan_end'); 
             const tb = document.getElementById('tableBodyLaporanKunjungan'); 
             if(!tb) return;
             tb.innerHTML = '';
             if (fd.length === 0) { tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Data Kosong.</td></tr>`; return; }
             fd.forEach((r, i) => {
-                let st = r.status === 'selesai_kasir' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">LUNAS</span>' : (r.status === 'antrean_kasir' ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">KASIR</span>' : '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">MEDIS</span>');
+                let st = r.status === 'selesai_kasir' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] md:text-xs font-bold">LUNAS</span>' : (r.status === 'antrean_kasir' ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-[10px] md:text-xs font-bold">KASIR</span>' : '<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] md:text-xs font-bold">MEDIS</span>');
                 
                 let alamatLengkap = r.alamat || '-';
                 if (r.rt && r.rt !== '-' && r.rw && r.rw !== '-') alamatLengkap += ` RT.${r.rt}/RW.${r.rw}`;
                 if (r.kel && r.kel !== '-') alamatLengkap += `, ${r.kel}`;
 
-                tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-center">${i+1}</td><td class="p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuDaftar}</td><td class="p-4 font-mono">${r.erm}</td><td class="p-4 font-bold uppercase">${r.nama}</td><td class="p-4">${r.jk}</td><td class="p-4 text-xs truncate max-w-[150px]">${alamatLengkap}</td><td class="p-4">${st}</td></tr>`;
+                tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-3 md:p-4 text-center">${i+1}</td><td class="p-3 md:p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuDaftar}</td><td class="p-3 md:p-4 font-mono">${r.erm}</td><td class="p-3 md:p-4 font-bold uppercase">${r.nama}</td><td class="p-3 md:p-4">${r.jk}</td><td class="p-3 md:p-4 text-[10px] md:text-xs truncate max-w-[150px] md:max-w-[200px]" title="${alamatLengkap}">${alamatLengkap}</td><td class="p-3 md:p-4">${st}</td></tr>`;
             });
         }
         
         function renderLaporanKeuangan() {
-            const filterType = document.getElementById('filter_waktu_keuangan').value;
-            const fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir'), filterType, 'keuangan_start', 'keuangan_end'); 
+            const fd = filterDataByDate(pelayananData.filter(p => p.status === 'selesai_kasir'), 'keuangan_start', 'keuangan_end'); 
             const tb = document.getElementById('tableBodyLaporanKeuangan'), tf = document.getElementById('tfootLaporanKeuangan'); 
             if(!tb) return;
             tb.innerHTML = ''; tf.innerHTML = '';
             if (fd.length === 0) { tb.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">Data Kosong.</td></tr>`; return; }
             let tot = 0; const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' });
-            fd.forEach((r, i) => { const tag = parseFloat(r.tagihan) || 0; tot += tag; tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 text-center">${i+1}</td><td class="p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuMedisSelesai}</td><td class="p-4 font-mono">${r.erm}</td><td class="p-4 font-bold uppercase">${r.nama}</td><td class="p-4 text-right text-emerald-600 font-bold">${fmt.format(tag)}</td></tr>`; });
-            tf.innerHTML = `<tr><td colspan="4" class="p-4 text-right uppercase">Total:</td><td class="p-4 text-right text-xl">${fmt.format(tot)}</td></tr>`;
+            fd.forEach((r, i) => { const tag = parseFloat(r.tagihan) || 0; tot += tag; tb.innerHTML += `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-3 md:p-4 text-center">${i+1}</td><td class="p-3 md:p-4">${new Date(r.tanggalSistem).toLocaleDateString('id-ID')} ${r.waktuMedisSelesai}</td><td class="p-3 md:p-4 font-mono">${r.erm}</td><td class="p-3 md:p-4 font-bold uppercase">${r.nama}</td><td class="p-3 md:p-4 text-right text-emerald-600 font-bold">${fmt.format(tag)}</td></tr>`; });
+            tf.innerHTML = `<tr><td colspan="4" class="p-3 md:p-4 text-right uppercase">Total:</td><td class="p-3 md:p-4 text-right text-lg md:text-xl">${fmt.format(tot)}</td></tr>`;
         }
         
         function downloadLaporan(t) {
-            let fd = [], f = '', nm = '', csv = "sep=,\n";
+            let fd = [], nm = '', csv = "sep=,\n";
             if (t === 'kunjungan') {
-                f = document.getElementById('filter_waktu_kunjungan').value; 
-                fd = filterDataByDate(pelayananData, f, 'kunjungan_start', 'kunjungan_end'); 
+                fd = filterDataByDate(pelayananData, 'kunjungan_start', 'kunjungan_end'); 
                 nm = `Laporan_Kunjungan_ERM_${Date.now()}.csv`; 
                 csv += "No,Tanggal,Waktu,eRM,Nama Pasien,Jenis Kelamin,Alamat Lengkap,Status Kunjungan\n";
                 fd.forEach((r, i) => { 
@@ -1335,8 +1314,7 @@
                     csv += `${i+1},"${new Date(r.tanggalSistem).toLocaleDateString('id-ID')}","${r.waktuDaftar}","${r.erm}","${r.nama}","${r.jk}","${alamatLengkap}","${statusTxt}"\n`; 
                 });
             } else {
-                f = document.getElementById('filter_waktu_keuangan').value; 
-                fd = filterDataByDate(pelayananData.filter(p=>p.status==='selesai_kasir'), f, 'keuangan_start', 'keuangan_end'); 
+                fd = filterDataByDate(pelayananData.filter(p=>p.status==='selesai_kasir'), 'keuangan_start', 'keuangan_end'); 
                 nm = `Laporan_Keuangan_ERM_${Date.now()}.csv`; 
                 csv += "No,Tanggal Pembayaran,Waktu Lunas,eRM,Nama Pasien,Nominal Tagihan (Rp)\n"; 
                 let tot = 0;
