@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #334155; } 
@@ -36,6 +38,16 @@
         .form-input { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; width: 100%; transition: all 0.2s; background-color: #fff; }
         .form-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
         .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.25rem; }
+
+        /* Custom Flatpickr Styling */
+        .flatpickr-calendar { font-family: 'Plus Jakarta Sans', sans-serif !important; border: 1px solid #e2e8f0; border-radius: 1rem !important; padding: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important; }
+        .flatpickr-day { border-radius: 0.5rem !important; }
+        .flatpickr-day.selected { background-color: #2563eb !important; border-color: #2563eb !important; color: white !important; font-weight: bold; }
+        
+        /* Indikator Pasien Belum Dilayani */
+        .flatpickr-day.pending-medis { color: #ef4444 !important; font-weight: 800 !important; background-color: #fef2f2; border: 1px solid #fca5a5; position: relative; }
+        .flatpickr-day.pending-medis::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: #ef4444; border-radius: 50%; }
+        .flatpickr-day.pending-medis.selected::after { background-color: white; }
     </style>
 </head>
 <body class="text-sm overflow-x-hidden">
@@ -94,6 +106,11 @@
                             <div>
                                 <label class="form-label">Nama Lengkap <span class="text-rose-500">*</span></label>
                                 <input type="text" id="form_nama" required placeholder="Masukkan nama sesuai KTP" class="form-input uppercase">
+                            </div>
+
+                            <div>
+                                <label class="form-label">No. WhatsApp</label>
+                                <input type="tel" id="form_no_wa" placeholder="081234567890" class="form-input">
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -308,6 +325,13 @@
                                 <textarea id="pel_resep" required rows="3" class="form-input font-mono bg-yellow-50 border-yellow-200 text-sm" placeholder="R/ Paracetamol 500mg S 3dd1..."></textarea>
                             </div>
                         </div>
+
+                        <!-- INPUT JADWAL KONTROL TAMBAHAN -->
+                        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center gap-4">
+                            <label class="form-label text-sm md:text-base mb-0 md:w-1/3"><i class="fas fa-calendar-check text-purple-500 mr-2"></i>Jadwal Kontrol Berikutnya <br><span class="text-[10px] font-normal text-slate-400 leading-tight">(Kosongi jika tidak perlu kembali)</span></label>
+                            <input type="date" id="pel_tgl_kontrol" class="form-input bg-purple-50 border-purple-200 text-purple-700 font-bold md:w-2/3 focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+
                     </div>
 
                     <div class="mt-6 md:mt-8 pt-4 md:pt-5 border-t border-slate-200 flex flex-col sm:flex-row justify-end gap-3">
@@ -409,6 +433,13 @@
                             </ul>
                         </div>
                     </li>
+
+                    <!-- MENU BARU: Jadwal Kontrol -->
+                    <li>
+                        <button onclick="switchView('jadwal_kontrol')" class="px-3 md:px-5 py-3 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
+                            <i class="fas fa-calendar-check text-teal-200"></i> <span class="hidden sm:inline">Jadwal Kontrol</span>
+                        </button>
+                    </li>
                     
                     <!-- Laporan Dropdown -->
                     <li class="relative group">
@@ -499,7 +530,7 @@
                 </h1>
                 <div class="flex items-center gap-2 md:gap-3 bg-white p-1 md:p-1.5 rounded-lg border border-blue-200 shadow-sm w-full sm:w-auto overflow-hidden">
                     <label class="text-[10px] md:text-xs font-bold text-blue-800 px-2 uppercase tracking-wider shrink-0"><i class="far fa-calendar-alt mr-1"></i> Tanggal:</label>
-                    <input type="date" id="filter_tgl_medis" onchange="renderTabelPelayananMedis()" class="form-input py-1 md:py-1.5 px-2 text-xs md:text-sm font-semibold text-blue-700 border-none focus:ring-0 cursor-pointer w-full sm:w-auto bg-blue-50/30 rounded-md">
+                    <input type="text" id="filter_tgl_medis" placeholder="Pilih Tanggal..." class="form-input py-1 md:py-1.5 px-2 text-xs md:text-sm font-bold text-blue-700 border-none focus:ring-0 cursor-pointer w-full sm:w-[150px] bg-blue-50/30 rounded-md text-center hover:bg-blue-100 transition-colors">
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
@@ -514,6 +545,30 @@
                         </tr>
                     </thead>
                     <tbody id="tableBodyPelayananMedis" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= VIEW JADWAL KONTROL ================= -->
+        <div id="view-jadwal-kontrol" class="bg-white border border-slate-200 rounded-2xl shadow-sm hidden overflow-hidden transition-all duration-300 w-full">
+            <div class="bg-purple-50 border-b border-purple-100 px-4 md:px-6 py-4 md:py-5 flex items-center justify-between">
+                <h1 class="text-lg md:text-xl font-bold text-purple-800 flex items-center gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white text-purple-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-calendar-check"></i></div>
+                    Jadwal Kontrol Pasien
+                </h1>
+            </div>
+            <div class="table-container p-2 min-h-[400px]">
+                <table class="w-full text-left whitespace-nowrap min-w-[700px]">
+                    <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+                        <tr>
+                            <th class="p-3 md:p-4 rounded-tl-lg text-center w-10 md:w-12">#</th>
+                            <th class="p-3 md:p-4">No. eRM</th>
+                            <th class="p-3 md:p-4">Nama Pasien</th>
+                            <th class="p-3 md:p-4">Jadwal Kontrol Seharusnya</th>
+                            <th class="p-3 md:p-4 rounded-tr-lg text-center w-36 md:w-48">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyJadwalKontrol" class="text-xs md:text-sm text-slate-600 divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
@@ -647,10 +702,13 @@
 
     </main>
 
+    <!-- Flatpickr JS & Locale ID -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
     <script>
         // --- Sistem Konfigurasi & Backend URL ---
-        // GANTI STRING DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk8GYYPdYmf7_BwWHfTrQE6ASv4Kd3KJzUY2CPe7VyW7l7vnBQijO0DzFgOUkibcdmzQ/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywnRdl37jDi7N5Ue7ZzxP_0UN2GV6jRxuQRTIYVzE5jEBQdXS6MJqIXJUlxv14-9P7FQ/exec';
 
         // --- Sistem API Fetch (Untuk GitHub / Mode Mandiri) ---
         async function apiCall(action, payload = null) {
@@ -660,22 +718,40 @@
             }
             try {
                 let res;
+                let fetchOptions = {
+                    redirect: 'follow', // Penting untuk Google Apps Script
+                };
+
                 if (payload) {
-                    res = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: action, data: payload }),
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                    });
+                    fetchOptions.method = 'POST';
+                    // GAS memerlukan data dikirim sebagai string plain text untuk menghindari preflight CORS
+                    fetchOptions.body = JSON.stringify({ action: action, data: payload });
+                    fetchOptions.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
+                    res = await fetch(SCRIPT_URL, fetchOptions);
                 } else {
-                    res = await fetch(`${SCRIPT_URL}?action=${action}`);
+                    res = await fetch(`${SCRIPT_URL}?action=${action}`, fetchOptions);
                 }
-                const result = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const resultText = await res.text(); // Ambil teks mentah dulu
+                let result;
+                try {
+                    result = JSON.parse(resultText); // Parse manual untuk menangkap error parsing
+                } catch (e) {
+                    console.error("Gagal parse JSON dari server. Response mentah:", resultText);
+                    throw new Error("Format respons dari server tidak valid (bukan JSON).");
+                }
+
                 if (result.status === 'success') {
                     return result.data;
                 } else {
-                    throw new Error(result.message);
+                    throw new Error(result.message || 'Error tidak diketahui dari server');
                 }
             } catch (error) {
+                console.error(`API Error pada aksi ${action}:`, error);
                 throw error;
             }
         }
@@ -706,6 +782,43 @@
         let pelayananData = []; 
         let riwayatMedisGlobal = []; 
         let editPasienIndex = -1;
+        let kalenderMedisInstance = null; // Menyimpan instance flatpickr
+
+        // --- Inisialisasi Flatpickr ---
+        function initKalenderMedis() {
+            const el = document.getElementById('filter_tgl_medis');
+            if(!el) return;
+
+            kalenderMedisInstance = flatpickr(el, {
+                locale: 'id',
+                dateFormat: "Y-m-d",
+                defaultDate: "today",
+                altInput: true,
+                altFormat: "d F Y",
+                disableMobile: true, // Memaksa popup flatpickr di mobile, bukan native wheel
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    // Logika untuk menandai tanggal yang memiliki pasien belum dilayani (pending-medis)
+                    // Format tanggal dari Flatpickr element: YYYY-MM-DD (perlu format sesuai data kita)
+                    const dateObj = dayElem.dateObj;
+                    const formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+                    
+                    // Cek apakah di data pelayananData ada pasien status 'antrean_medis' pada tanggal ini
+                    const hasPending = pelayananData.some(p => {
+                        if(!p.tanggalSistem || p.status !== 'antrean_medis') return false;
+                        const pD = new Date(p.tanggalSistem);
+                        const pDateStr = `${pD.getFullYear()}-${String(pD.getMonth() + 1).padStart(2, '0')}-${String(pD.getDate()).padStart(2, '0')}`;
+                        return pDateStr === formattedDate;
+                    });
+
+                    if(hasPending) {
+                        dayElem.classList.add('pending-medis');
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    renderTabelPelayananMedis();
+                }
+            });
+        }
 
         // --- Konfigurasi Sistem ---
         let appConfig = {
@@ -720,7 +833,8 @@
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
             // Null check element existence to prevent crash
-            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
+            // Menambahkan jadwal-kontrol ke dalam viewsList
+            const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
             
             // Cek otorisasi untuk menu sensitif
             const protectedViews = ['laporan_kunjungan', 'laporan_keuangan', 'pengaturan'];
@@ -742,8 +856,10 @@
             const targetView = document.getElementById(targetId);
             if(targetView) targetView.classList.remove('hidden');
 
+            // Render view spesifik saat di-klik
             if (view === 'pelayanan_medis') renderTabelPelayananMedis();
             if (view === 'pelayanan_kasir') renderTabelPelayananKasir();
+            if (view === 'jadwal_kontrol') renderJadwalKontrol();
             if (view === 'laporan_kunjungan') renderLaporanKunjungan();
             if (view === 'laporan_keuangan') renderLaporanKeuangan();
         }
@@ -858,6 +974,7 @@
             document.getElementById('form_tgl_hari').value = '';
             document.getElementById('form_tgl_bulan').value = '';
             document.getElementById('form_tgl_tahun').value = '';
+            document.getElementById('form_no_wa').value = '';
             document.getElementById('form_erm').value = "P" + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
             document.getElementById('titleModalPasien').innerHTML = '<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600"><i class="fas fa-user-plus"></i></div>Pendaftaran Pasien Baru';
             hitungUmur(); tampilModal('modalBuatBaru', 'modalContent');
@@ -872,6 +989,7 @@
             document.getElementById('titleModalPasien').innerHTML = '<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600"><i class="fas fa-edit"></i></div>Edit Data Pasien';
             document.getElementById('form_erm').value = p.erm;
             document.getElementById('form_nama').value = p.nama;
+            document.getElementById('form_no_wa').value = p.no_wa || '';
             document.getElementById('form_status_kk').value = p.status_kk || '';
             document.getElementById('form_tempat_lahir').value = p.tempatLahirRaw || '';
             document.getElementById('form_kelurahan').value = p.kel || '';
@@ -908,6 +1026,7 @@
             const dataObj = {
                 erm: document.getElementById('form_erm').value,
                 nama: document.getElementById('form_nama').value.toUpperCase(),
+                no_wa: document.getElementById('form_no_wa').value,
                 status_kk: document.getElementById('form_status_kk').value,
                 jk: document.querySelector('input[name="jk"]:checked')?.value || '-',
                 tglLahirRaw: tglLahirRaw,
@@ -952,7 +1071,10 @@
             const searchInput = document.getElementById('searchInput');
             const query = searchInput ? searchInput.value.toLowerCase() : '';
             
-            const filteredData = data.filter(r => 
+            // Handle kemungkinan data null / undefined dari server
+            const safeData = Array.isArray(data) ? data : [];
+
+            const filteredData = safeData.filter(r => 
                 (r.nama && r.nama.toLowerCase().includes(query)) || 
                 (r.erm && r.erm.toLowerCase().includes(query))
             );
@@ -998,12 +1120,11 @@
             
             if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
                 try {
-                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
-                        apiCall('getConfig'),
-                        apiCall('getPasienData'),
-                        apiCall('getPelayananData'),
-                        apiCall('getRiwayatData')
-                    ]);
+                    // Melakukan fetch berurutan untuk mencegah server Google Apps Script kewalahan (Error 429 / Concurrent Limit)
+                    const resConfig = await apiCall('getConfig').catch(e => { console.warn("Gagal getConfig", e); return null; });
+                    const resPasien = await apiCall('getPasienData').catch(e => { console.warn("Gagal getPasien", e); return []; });
+                    const resPelayanan = await apiCall('getPelayananData').catch(e => { console.warn("Gagal getPelayanan", e); return []; });
+                    const resRiwayat = await apiCall('getRiwayatData').catch(e => { console.warn("Gagal getRiwayat", e); return []; });
                     
                     if (resConfig) {
                         appConfig = resConfig;
@@ -1012,29 +1133,33 @@
                         document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
                     }
                     
-                    if (resPasien) patientsData = resPasien;
+                    if (resPasien && Array.isArray(resPasien)) patientsData = resPasien;
                     
-                    if (resPelayanan) {
+                    if (resPelayanan && Array.isArray(resPelayanan)) {
                         pelayananData = resPelayanan.map(p => {
                             const pat = patientsData.find(x => x.erm === p.erm) || {};
-                            return { ...p, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-' };
+                            // Memastikan field tglKontrol dan statusKontrol dipertahankan dari database jika ada
+                            return { ...p, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
                         });
                     }
                     
-                    if (resRiwayat) riwayatMedisGlobal = resRiwayat;
+                    if (resRiwayat && Array.isArray(resRiwayat)) riwayatMedisGlobal = resRiwayat;
                     
                     renderTabel(patientsData);
+                    initKalenderMedis(); // Inisialisasi kalender setelah data termuat
                     renderTabelPelayananMedis();
                     renderTabelPelayananKasir();
+                    if(document.getElementById('view-jadwal-kontrol') && document.getElementById('view-jadwal-kontrol').classList.contains('hidden') === false) renderJadwalKontrol();
                     updateBadges();
                     showToast('Sinkronisasi Database Berhasil!', 'success');
 
                 } catch(err) {
-                    showToast('Gagal sinkronisasi: ' + err.message, 'error');
-                    renderTabel([]);
+                    console.error("Terjadi kesalahan fatal saat sinkronisasi:", err);
+                    showToast('Gagal sinkronisasi data: ' + err.message, 'error');
+                    renderTabel(patientsData); // Tetap render data lokal jika ada
                 }
             } else {
-                setTimeout(() => { showToast('Mode Lokal. Silakan isi SCRIPT_URL!', 'warning'); renderTabel(patientsData); }, 800);
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SCRIPT_URL!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
             }
         }
 
@@ -1069,17 +1194,32 @@
                 if (pelayananData.some(p => p.erm === pasienPelayananAktif.erm && p.status !== 'selesai_kasir')) { 
                     showToast('Pasien ini sudah ada di antrean aktif!', 'warning'); return; 
                 }
+
+                // Hapus jadwal kontrol lama (bila ada) karena pasien sudah datang mendaftar
+                const idxLama = pelayananData.findIndex(p => p.erm === pasienPelayananAktif.erm && p.statusKontrol === 'pending');
+                if(idxLama !== -1) {
+                    pelayananData[idxLama].statusKontrol = 'selesai';
+                    if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                        try {
+                            const dataToServer = { ...pelayananData[idxLama], tanggalSistem: new Date(pelayananData[idxLama].tanggalSistem).toISOString() };
+                            apiCall('simpanPelayanan', dataToServer); 
+                        } catch(err) { console.error('Gagal update status kontrol lama di DB:', err); }
+                    }
+                }
                 
                 const d = new Date();
                 const newAntrean = { 
                     ...pasienPelayananAktif, 
                     waktuDaftar: d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), 
                     tanggalSistem: d, 
-                    status: 'antrean_medis' 
+                    status: 'antrean_medis',
+                    tglKontrol: '',
+                    statusKontrol: '-'
                 };
                 
                 pelayananData.push(newAntrean);
                 updateBadges(); 
+                if(kalenderMedisInstance) kalenderMedisInstance.redraw(); // Update badge kalender
                 showToast(`Kirim ke Poli Medis Berhasil!`, 'success'); 
                 tutupKonfirmasi();
                 
@@ -1088,9 +1228,14 @@
                     renderTabelPelayananMedis();
                 }
 
+                // Refresh tabel jadwal kontrol secara lokal agar jika pasien ini ada di list, otomatis hilang
+                if(document.getElementById('view-jadwal-kontrol') && !document.getElementById('view-jadwal-kontrol').classList.contains('hidden')) {
+                    renderJadwalKontrol();
+                }
+
                 if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
                     try {
-                        const dataToServer = { ...newAntrean, tanggalSistem: newAntrean.tanggalSistem.toISOString() };
+                        const dataToServer = { ...newAntrean, tanggalSistem: new Date(newAntrean.tanggalSistem).toISOString() };
                         await apiCall('simpanPelayanan', dataToServer);
                     } catch(err) {
                         showToast('Gagal server: '+err.message,'error');
@@ -1139,6 +1284,8 @@
             rekamMedisAktif = pelayananData.find(p => p.erm === erm); if(!rekamMedisAktif) return;
             document.getElementById('info_nama_pelayanan').textContent = rekamMedisAktif.nama; document.getElementById('info_erm_pelayanan').textContent = rekamMedisAktif.erm;
             ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { document.getElementById('pel_'+k).value = rekamMedisAktif[k] || ''; });
+            const elTglKontrol = document.getElementById('pel_tgl_kontrol');
+            if(elTglKontrol) elTglKontrol.value = rekamMedisAktif.tglKontrol || '';
             tampilModal('modalPelayanan', 'modalPelayananContent');
         }
         function tutupFormPelayanan() { sembunyikanModal('modalPelayanan', 'modalPelayananContent'); }
@@ -1150,6 +1297,16 @@
                 let logRiwayat = null;
                 if(idx !== -1) {
                     ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { pelayananData[idx][k] = document.getElementById('pel_'+k).value; });
+                    
+                    const elTglKontrol = document.getElementById('pel_tgl_kontrol');
+                    if(elTglKontrol && elTglKontrol.value) {
+                        pelayananData[idx].tglKontrol = elTglKontrol.value;
+                        pelayananData[idx].statusKontrol = 'pending';
+                    } else {
+                        pelayananData[idx].tglKontrol = '';
+                        pelayananData[idx].statusKontrol = '-';
+                    }
+
                     if(pelayananData[idx].status === 'antrean_medis') {
                         pelayananData[idx].status = 'antrean_kasir'; 
                         pelayananData[idx].waktuMedisSelesai = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -1161,7 +1318,10 @@
                 }
                 
                 showToast(`Pemeriksaan Selesai, Terkirim ke Kasir!`, 'success'); 
-                tutupFormPelayanan(); updateBadges(); renderTabelPelayananMedis();
+                tutupFormPelayanan(); updateBadges(); 
+                
+                if(kalenderMedisInstance) kalenderMedisInstance.redraw();
+                renderTabelPelayananMedis();
 
                 if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
                     try {
@@ -1173,6 +1333,82 @@
                     }
                 }
             }
+        }
+
+        // --- JADWAL KONTROL ---
+        function renderJadwalKontrol() {
+            const tb = document.getElementById('tableBodyJadwalKontrol');
+            if(!tb) return;
+            tb.innerHTML = '';
+
+            // Menghitung tanggal hari ini (jam dinolkan untuk perbandingan yang tepat)
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Filter data yang memiliki tanggal kontrol, masih berstatus pending, dan tanggalnya sudah lewat atau sama dengan hari ini.
+            const filteredData = pelayananData.filter(p => {
+                if (p.tglKontrol && p.statusKontrol === 'pending') {
+                    const kontrolDate = new Date(p.tglKontrol);
+                    kontrolDate.setHours(0,0,0,0);
+                    // Pasien tetap berada dalam daftar jika mereka telat/belum datang (kontrolDate <= today)
+                    return kontrolDate <= today;
+                }
+                return false;
+            });
+
+            if (filteredData.length === 0) { 
+                tb.innerHTML = `<tr><td colspan="5" class="p-16 text-center text-slate-400 font-medium">Tidak ada jadwal kontrol pasien yang tertunda hari ini.</td></tr>`; 
+                return; 
+            }
+
+            filteredData.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-purple-50/50 transition-colors border-b border-slate-100";
+                
+                // Format tanggal kontrol jadi format lokal
+                const d = new Date(row.tglKontrol);
+                const tglFormatLokal = d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                // Tombol aksi memicu fungsi WA ke pasien
+                const noWa = row.no_wa && row.no_wa !== '-' ? row.no_wa : '';
+                const btn = `<button onclick="hubungiPasien('${noWa}')" class="bg-green-500 hover:bg-green-600 text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-sm w-full transition transform hover:scale-105 flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-lg"></i> Hubungi Pasien</button>`;
+
+                tr.innerHTML = `
+                    <td class="p-3 md:p-4 text-center font-bold text-slate-500">${idx+1}</td>
+                    <td class="p-3 md:p-4 font-mono font-semibold text-slate-600">${row.erm}</td>
+                    <td class="p-3 md:p-4 font-bold text-slate-800 uppercase">${row.nama}</td>
+                    <td class="p-3 md:p-4 text-purple-700 font-medium"><i class="far fa-calendar mr-1"></i> ${tglFormatLokal}</td>
+                    <td class="p-3 md:p-4 text-center px-4">${btn}</td>
+                `;
+                tb.appendChild(tr);
+            });
+        }
+
+        function hubungiPasien(noWa) {
+            if(!noWa || noWa === '-' || noWa === 'undefined') {
+                showToast('No. WA pasien tidak tersedia, update di Pendaftaran terlebih dahulu.', 'warning');
+                return;
+            }
+            
+            // 1. Hapus semua karakter non-angka
+            let phone = noWa.replace(/\D/g, ''); 
+            
+            // 2. Logika perbaikan nomor:
+            // Jika diawali 0, ganti 0 dengan 62
+            if (phone.startsWith('0')) {
+                phone = '62' + phone.substring(1);
+            } 
+            // Jika diawali 8 (misal 813...), tambahkan 62 di depannya
+            else if (phone.startsWith('8')) {
+                phone = '62' + phone;
+            }
+            // Jika sudah diawali 62, biarkan (jangan ditambah lagi)
+
+            const msg = "Assalamualaikum wr wb, mohon ijin bpk/ibu mengingatkan jika waktunya untuk kontrol.";
+            
+            // Menggunakan api.whatsapp.com/send?phone=...
+            // Nomor telepon di parameter phone sebaiknya tidak menggunakan tanda '+' agar lebih stabil di berbagai perangkat
+            window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         // --- KASIR ---
@@ -1359,7 +1595,8 @@
             }
         }
 
-        // Init
+        // Init Aplikasi
+        // Hapus pemanggilan initKalenderMedis() mandiri di luar karena akan dipanggil di dalam fetchDataDariSpreadsheet()
         fetchDataDariSpreadsheet();
     </script>
 </body>
