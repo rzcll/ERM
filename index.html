@@ -55,29 +55,6 @@
     <!-- TOAST NOTIFICATION -->
     <div id="toast-container" class="fixed top-6 right-6 z-[300] flex flex-col gap-3 pointer-events-none w-[90%] md:w-auto max-w-sm"></div>
 
-    <!-- MODAL AKSES PASSWORD -->
-    <div id="modalPassword" class="fixed inset-0 bg-slate-900/70 z-[250] hidden flex justify-center items-center backdrop-blur-sm px-4">
-        <div id="modalPasswordContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[350px] modal-enter border border-slate-100">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-rose-200">
-                    <i class="fas fa-lock text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">Akses Terkunci</h3>
-                <p class="text-xs text-slate-500 mt-2 leading-relaxed">Masukkan password otorisasi untuk mengakses menu Laporan dan Pengaturan.</p>
-            </div>
-            <div class="mb-5 relative">
-                <i class="fas fa-key absolute left-3.5 top-3.5 text-slate-400"></i>
-                <input type="password" id="input_password_akses" class="form-input pl-10 text-center tracking-widest text-lg py-3 bg-slate-50 border-slate-300 focus:border-rose-400 focus:ring-rose-400 font-bold" placeholder="••••••••" onkeyup="if(event.key === 'Enter') verifikasiPassword()">
-            </div>
-            <div class="flex gap-2">
-                <button onclick="batalPassword()" class="w-1/3 py-2.5 border border-slate-300 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors">Batal</button>
-                <button onclick="verifikasiPassword()" class="w-2/3 py-2.5 bg-rose-500 text-white rounded-xl font-bold hover:bg-rose-600 hover:shadow-lg hover:shadow-rose-500/30 transition-all flex justify-center items-center gap-2">
-                    Buka Akses <i class="fas fa-arrow-right text-xs"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL BUAT BARU / EDIT PASIEN -->
     <div id="modalBuatBaru" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-start pt-4 md:pt-10 pb-10 overflow-y-auto px-4">
         <div id="modalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl modal-enter border border-slate-100">
@@ -614,7 +591,6 @@
                         </div>
                     </div>
                     <button onclick="downloadLaporan('kunjungan')" class="flex-1 sm:flex-none bg-teal-600 text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-teal-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
-                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center justify-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
@@ -638,7 +614,6 @@
                         </div>
                     </div>
                     <button onclick="downloadLaporan('keuangan')" class="flex-1 sm:flex-none bg-emerald-600 text-white px-3 md:px-5 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-emerald-700 flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Export CSV</button>
-                    <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center justify-center gap-2" title="Kunci Akses"><i class="fas fa-lock"></i></button>
                 </div>
             </div>
             <div class="table-container p-2 min-h-[400px]">
@@ -653,7 +628,6 @@
                     <div class="w-8 h-8 md:w-10 md:h-10 bg-white text-slate-600 rounded-lg shadow-sm flex items-center justify-center"><i class="fas fa-cog"></i></div>
                     Pengaturan Sistem
                 </h1>
-                <button onclick="logoutAdmin()" class="bg-rose-100 text-rose-600 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-bold shadow-sm hover:bg-rose-200 flex items-center gap-2"><i class="fas fa-lock"></i> <span class="hidden sm:inline">Kunci Akses</span></button>
             </div>
             
             <div class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
@@ -676,24 +650,6 @@
                         </div>
                         <div class="pt-2">
                             <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white text-sm md:text-base font-bold rounded-xl hover:bg-blue-700 shadow-md transition-all">Simpan Template Struk</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PENGATURAN PASSWORD -->
-                <div class="border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm">
-                    <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-shield-alt text-rose-500 mr-2"></i> Pengaturan Keamanan</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="bg-rose-50 p-3 md:p-4 rounded-xl border border-rose-100 mb-4">
-                            <p class="text-[10px] md:text-xs text-rose-700 font-medium leading-relaxed">Password ini digunakan untuk mengunci akses ke menu Laporan dan Pengaturan agar tidak bisa diubah oleh sembarang orang. <br><br><b>Password bawaan: admin</b></p>
-                        </div>
-                        <div>
-                            <label class="form-label text-xs md:text-sm">Password Baru</label>
-                            <input type="password" id="set_pass_baru" class="form-input tracking-widest font-bold text-center" placeholder="••••••••">
-                        </div>
-                        <div class="pt-2">
-                            <button onclick="simpanPengaturanPassword()" class="w-full py-2.5 bg-rose-500 text-white text-sm md:text-base font-bold rounded-xl hover:bg-rose-600 shadow-md transition-all">Ganti Password Akses</button>
                         </div>
                     </div>
                 </div>
@@ -822,31 +778,16 @@
 
         // --- Konfigurasi Sistem ---
         let appConfig = {
-            passwordAkses: 'admin',
             strukKop: 'eRM BPM CLINIC',
             strukAlamat: 'Struk Resmi',
             strukFooter: 'Terima Kasih, Semoga Lekas Sembuh'
         };
-        let isOtorisasiValid = false;
-        let pendingView = '';
 
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
             // Null check element existence to prevent crash
-            // Menambahkan jadwal-kontrol ke dalam viewsList
             const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
             
-            // Cek otorisasi untuk menu sensitif
-            const protectedViews = ['laporan_kunjungan', 'laporan_keuangan', 'pengaturan'];
-            if (protectedViews.includes(view) && !isOtorisasiValid) {
-                pendingView = view;
-                const inputPwd = document.getElementById('input_password_akses');
-                if (inputPwd) inputPwd.value = '';
-                tampilModal('modalPassword', 'modalPasswordContent');
-                setTimeout(() => { if(inputPwd) inputPwd.focus(); }, 300);
-                return;
-            }
-
             viewsList.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
                 if(el) el.classList.add('hidden');
@@ -862,35 +803,6 @@
             if (view === 'jadwal_kontrol') renderJadwalKontrol();
             if (view === 'laporan_kunjungan') renderLaporanKunjungan();
             if (view === 'laporan_keuangan') renderLaporanKeuangan();
-        }
-
-        // --- Logika Modal Password & Logout ---
-        function batalPassword() {
-            sembunyikanModal('modalPassword', 'modalPasswordContent');
-            pendingView = '';
-        }
-
-        function verifikasiPassword() {
-            const input = document.getElementById('input_password_akses').value;
-            if (input === appConfig.passwordAkses) {
-                isOtorisasiValid = true;
-                sembunyikanModal('modalPassword', 'modalPasswordContent');
-                showToast('Akses diizinkan', 'success');
-                if (pendingView) {
-                    switchView(pendingView);
-                    pendingView = '';
-                }
-            } else {
-                showToast('Password salah!', 'error');
-                document.getElementById('input_password_akses').value = '';
-                document.getElementById('input_password_akses').focus();
-            }
-        }
-
-        function logoutAdmin() {
-            isOtorisasiValid = false;
-            showToast('Akses Admin telah dikunci.', 'info');
-            switchView('pendaftaran');
         }
 
         // --- Logika Simpan Pengaturan ---
@@ -910,18 +822,6 @@
             appConfig.strukFooter = document.getElementById('set_struk_footer').value || '-';
             await simpanConfigKeServer();
             showToast('Template Struk berhasil diperbarui!', 'success');
-        }
-
-        async function simpanPengaturanPassword() {
-            const passBaru = document.getElementById('set_pass_baru').value;
-            if (!passBaru || passBaru.length < 3) {
-                showToast('Password baru harus minimal 3 karakter!', 'warning');
-                return;
-            }
-            appConfig.passwordAkses = passBaru;
-            document.getElementById('set_pass_baru').value = '';
-            await simpanConfigKeServer();
-            showToast('Password Akses berhasil diubah!', 'success');
         }
 
         // --- Fungsi Bawaan Formulir ---
@@ -1214,7 +1114,8 @@
                     tanggalSistem: d, 
                     status: 'antrean_medis',
                     tglKontrol: '',
-                    statusKontrol: '-'
+                    statusKontrol: '-',
+                    keluhan: '', td: '', nadi: '', nafas: '', suhu: '', spo2: '', tb: '', bb: '', laborat: '', resep: '', tagihan: 0
                 };
                 
                 pelayananData.push(newAntrean);
@@ -1281,7 +1182,8 @@
 
         let rekamMedisAktif = null;
         function bukaFormPelayanan(erm) {
-            rekamMedisAktif = pelayananData.find(p => p.erm === erm); if(!rekamMedisAktif) return;
+            // Gunakan reverse() agar yang diedit adalah antrean terbaru yang masih kosong, bukan antrean lama dari history pasien
+            rekamMedisAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!rekamMedisAktif) return;
             document.getElementById('info_nama_pelayanan').textContent = rekamMedisAktif.nama; document.getElementById('info_erm_pelayanan').textContent = rekamMedisAktif.erm;
             ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { document.getElementById('pel_'+k).value = rekamMedisAktif[k] || ''; });
             const elTglKontrol = document.getElementById('pel_tgl_kontrol');
@@ -1434,7 +1336,7 @@
 
         let pasienKasirAktif = null;
         function bukaFormKasir(erm) {
-            pasienKasirAktif = pelayananData.find(p => p.erm === erm); if(!pasienKasirAktif) return;
+            pasienKasirAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!pasienKasirAktif) return;
             document.getElementById('info_nama_kasir').textContent = pasienKasirAktif.nama; document.getElementById('info_erm_kasir').textContent = pasienKasirAktif.erm;
             document.getElementById('info_resep_kasir').textContent = pasienKasirAktif.resep || '-';
             const inT = document.getElementById('input_tagihan_kasir'), btnS = document.getElementById('btnSimpanKasir'), btnC = document.getElementById('btnCetakStruk');
