@@ -658,58 +658,22 @@
 
     </main>
 
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <!-- Flatpickr JS & Locale ID -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
     <script>
-        // --- Sistem Konfigurasi & Backend URL ---
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywnRdl37jDi7N5Ue7ZzxP_0UN2GV6jRxuQRTIYVzE5jEBQdXS6MJqIXJUlxv14-9P7FQ/exec';
-
-        // --- Sistem API Fetch (Untuk GitHub / Mode Mandiri) ---
-        async function apiCall(action, payload = null) {
-            if (!SCRIPT_URL || SCRIPT_URL === 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
-                console.warn("SCRIPT_URL belum diatur. Menggunakan Mode Lokal.");
-                return null;
-            }
-            try {
-                let res;
-                let fetchOptions = {
-                    redirect: 'follow', // Penting untuk Google Apps Script
-                };
-
-                if (payload) {
-                    fetchOptions.method = 'POST';
-                    // GAS memerlukan data dikirim sebagai string plain text untuk menghindari preflight CORS
-                    fetchOptions.body = JSON.stringify({ action: action, data: payload });
-                    fetchOptions.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
-                    res = await fetch(SCRIPT_URL, fetchOptions);
-                } else {
-                    res = await fetch(`${SCRIPT_URL}?action=${action}`, fetchOptions);
-                }
-
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-
-                const resultText = await res.text(); // Ambil teks mentah dulu
-                let result;
-                try {
-                    result = JSON.parse(resultText); // Parse manual untuk menangkap error parsing
-                } catch (e) {
-                    console.error("Gagal parse JSON dari server. Response mentah:", resultText);
-                    throw new Error("Format respons dari server tidak valid (bukan JSON).");
-                }
-
-                if (result.status === 'success') {
-                    return result.data;
-                } else {
-                    throw new Error(result.message || 'Error tidak diketahui dari server');
-                }
-            } catch (error) {
-                console.error(`API Error pada aksi ${action}:`, error);
-                throw error;
-            }
+        // --- Sistem Konfigurasi & Backend URL (Supabase) ---
+        // MASUKAN URL DAN ANON KEY SUPABASE ANDA DI SINI
+        const SUPABASE_URL = 'https://sxywrxbtwaxnymscumql.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4eXdyeGJ0d2F4bnltc2N1bXFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNjQ3ODgsImV4cCI6MjA5ODk0MDc4OH0.sMVmMW3uTrkE07if1C566FuBmk26iKieubFGFygX4UU';
+        
+        let supabaseClient = null;
+        if (SUPABASE_URL !== 'URL_SUPABASE_ANDA' && SUPABASE_KEY !== 'KEY_SUPABASE_ANDA') {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
 
         // --- Sistem Toast Notifikasi ---
@@ -808,8 +772,10 @@
         // --- Logika Simpan Pengaturan ---
         async function simpanConfigKeServer() {
             try {
-                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
-                    await apiCall('simpanConfig', appConfig);
+                if (supabaseClient) {
+                    const updates = Object.keys(appConfig).map(k => ({ key: k, value: appConfig[k] }));
+                    const { error } = await supabaseClient.from('pengaturan').upsert(updates, { onConflict: 'key' });
+                    if (error) throw error;
                 }
             } catch (err) {
                 showToast('Gagal sinkron config: ' + err.message, 'error');
@@ -944,9 +910,10 @@
 
             showToast('Menyimpan data...', 'info');
             
-            if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+            if (supabaseClient) {
                 try {
-                    await apiCall('simpanPasien', dataObj);
+                    const { error } = await supabaseClient.from('pasien').upsert(dataObj, { onConflict: 'erm' });
+                    if (error) throw error;
                     showToast(`Data ${dataObj.nama} berhasil disimpan ke Server!`, 'success');
                     tutupFormBaru();
                     fetchDataDariSpreadsheet(); 
@@ -1016,37 +983,45 @@
         // --- FULL DATABASE SYNC VIA FETCH ---
         async function fetchDataDariSpreadsheet() {
             const tb = document.getElementById('tableBody');
-            if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data API...</td></tr>`;
+            if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data Database...</td></tr>`;
             
-            if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+            if (supabaseClient) {
                 try {
-                    // Melakukan fetch berurutan untuk mencegah server Google Apps Script kewalahan (Error 429 / Concurrent Limit)
-                    const resConfig = await apiCall('getConfig').catch(e => { console.warn("Gagal getConfig", e); return null; });
-                    const resPasien = await apiCall('getPasienData').catch(e => { console.warn("Gagal getPasien", e); return []; });
-                    const resPelayanan = await apiCall('getPelayananData').catch(e => { console.warn("Gagal getPelayanan", e); return []; });
-                    const resRiwayat = await apiCall('getRiwayatData').catch(e => { console.warn("Gagal getRiwayat", e); return []; });
+                    // Mengambil 4 tabel secara bersamaan menggunakan Promise.all untuk kecepatan ekstra
+                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
+                        supabaseClient.from('pengaturan').select('*'),
+                        supabaseClient.from('pasien').select('*').order('erm', { ascending: false }),
+                        supabaseClient.from('pelayanan').select('*'),
+                        supabaseClient.from('riwayat').select('*')
+                    ]);
                     
-                    if (resConfig) {
-                        appConfig = resConfig;
+                    if (resConfig.error) throw resConfig.error;
+                    if (resPasien.error) throw resPasien.error;
+                    if (resPelayanan.error) throw resPelayanan.error;
+                    if (resRiwayat.error) throw resRiwayat.error;
+
+                    if (resConfig.data) {
+                        resConfig.data.forEach(item => {
+                            appConfig[item.key] = item.value;
+                        });
                         document.getElementById('set_struk_kop').value = appConfig.strukKop || 'eRM BPM CLINIC';
                         document.getElementById('set_struk_alamat').value = appConfig.strukAlamat || 'Struk Resmi';
                         document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
                     }
                     
-                    if (resPasien && Array.isArray(resPasien)) patientsData = resPasien;
+                    if (resPasien.data) patientsData = resPasien.data;
                     
-                    if (resPelayanan && Array.isArray(resPelayanan)) {
-                        pelayananData = resPelayanan.map(p => {
+                    if (resPelayanan.data) {
+                        pelayananData = resPelayanan.data.map(p => {
                             const pat = patientsData.find(x => x.erm === p.erm) || {};
-                            // Memastikan field tglKontrol dan statusKontrol dipertahankan dari database jika ada
                             return { ...p, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
                         });
                     }
                     
-                    if (resRiwayat && Array.isArray(resRiwayat)) riwayatMedisGlobal = resRiwayat;
+                    if (resRiwayat.data) riwayatMedisGlobal = resRiwayat.data;
                     
                     renderTabel(patientsData);
-                    initKalenderMedis(); // Inisialisasi kalender setelah data termuat
+                    initKalenderMedis(); 
                     renderTabelPelayananMedis();
                     renderTabelPelayananKasir();
                     if(document.getElementById('view-jadwal-kontrol') && document.getElementById('view-jadwal-kontrol').classList.contains('hidden') === false) renderJadwalKontrol();
@@ -1056,10 +1031,10 @@
                 } catch(err) {
                     console.error("Terjadi kesalahan fatal saat sinkronisasi:", err);
                     showToast('Gagal sinkronisasi data: ' + err.message, 'error');
-                    renderTabel(patientsData); // Tetap render data lokal jika ada
+                    renderTabel(patientsData); 
                 }
             } else {
-                setTimeout(() => { showToast('Mode Lokal. Silakan isi SCRIPT_URL!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
             }
         }
 
@@ -1099,10 +1074,9 @@
                 const idxLama = pelayananData.findIndex(p => p.erm === pasienPelayananAktif.erm && p.statusKontrol === 'pending');
                 if(idxLama !== -1) {
                     pelayananData[idxLama].statusKontrol = 'selesai';
-                    if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                    if (supabaseClient) {
                         try {
-                            const dataToServer = { ...pelayananData[idxLama], tanggalSistem: new Date(pelayananData[idxLama].tanggalSistem).toISOString() };
-                            apiCall('simpanPelayanan', dataToServer); 
+                            await supabaseClient.from('pelayanan').update({ statusKontrol: 'selesai' }).match({ erm: pelayananData[idxLama].erm, statusKontrol: 'pending' });
                         } catch(err) { console.error('Gagal update status kontrol lama di DB:', err); }
                     }
                 }
@@ -1129,15 +1103,20 @@
                     renderTabelPelayananMedis();
                 }
 
-                // Refresh tabel jadwal kontrol secara lokal agar jika pasien ini ada di list, otomatis hilang
                 if(document.getElementById('view-jadwal-kontrol') && !document.getElementById('view-jadwal-kontrol').classList.contains('hidden')) {
                     renderJadwalKontrol();
                 }
 
-                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                if (supabaseClient) {
                     try {
-                        const dataToServer = { ...newAntrean, tanggalSistem: new Date(newAntrean.tanggalSistem).toISOString() };
-                        await apiCall('simpanPelayanan', dataToServer);
+                        // Menghapus data-data duplikat master pasien sebelum dimasukan ke tabel pelayanan 
+                        const dataToServer = { 
+                            erm: newAntrean.erm, nama: newAntrean.nama, waktuDaftar: newAntrean.waktuDaftar, 
+                            tanggalSistem: new Date(newAntrean.tanggalSistem).toISOString(),
+                            status: newAntrean.status, statusKontrol: newAntrean.statusKontrol, tglKontrol: newAntrean.tglKontrol 
+                        };
+                        const { error } = await supabaseClient.from('pelayanan').insert(dataToServer);
+                        if(error) throw error;
                     } catch(err) {
                         showToast('Gagal server: '+err.message,'error');
                     }
@@ -1195,18 +1174,15 @@
         async function simpanDataPelayanan(e) {
             e.preventDefault();
             if(rekamMedisAktif) {
-                const idx = pelayananData.findIndex(p => p.erm === rekamMedisAktif.erm);
+                const idx = pelayananData.findIndex(p => p.erm === rekamMedisAktif.erm && p.waktuDaftar === rekamMedisAktif.waktuDaftar);
                 let logRiwayat = null;
                 if(idx !== -1) {
                     ['keluhan','td','nadi','nafas','suhu','spo2','tb','bb','laborat','resep'].forEach(k => { pelayananData[idx][k] = document.getElementById('pel_'+k).value; });
                     
                     const elTglKontrol = document.getElementById('pel_tgl_kontrol');
-                    if(elTglKontrol && elTglKontrol.value) {
+                    if(elTglKontrol) {
                         pelayananData[idx].tglKontrol = elTglKontrol.value;
-                        pelayananData[idx].statusKontrol = 'pending';
-                    } else {
-                        pelayananData[idx].tglKontrol = '';
-                        pelayananData[idx].statusKontrol = '-';
+                        pelayananData[idx].statusKontrol = elTglKontrol.value ? 'pending' : '-';
                     }
 
                     if(pelayananData[idx].status === 'antrean_medis') {
@@ -1220,16 +1196,21 @@
                 }
                 
                 showToast(`Pemeriksaan Selesai, Terkirim ke Kasir!`, 'success'); 
-                tutupFormPelayanan(); updateBadges(); 
-                
-                if(kalenderMedisInstance) kalenderMedisInstance.redraw();
-                renderTabelPelayananMedis();
+                tutupFormPelayanan(); updateBadges(); renderTabelPelayananMedis();
 
-                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                if (supabaseClient) {
                     try {
-                        const dataToServer = { ...pelayananData[idx], tanggalSistem: new Date(pelayananData[idx].tanggalSistem).toISOString() };
-                        await apiCall('simpanPelayanan', dataToServer);
-                        if(logRiwayat) await apiCall('simpanRiwayat', logRiwayat);
+                        const target = pelayananData[idx];
+                        const dataToServer = {
+                            waktuMedisSelesai: target.waktuMedisSelesai || '', keluhan: target.keluhan || '', td: target.td || '', 
+                            nadi: target.nadi || '', nafas: target.nafas || '', suhu: target.suhu || '', spo2: target.spo2 || '', tb: target.tb || '', 
+                            bb: target.bb || '', laborat: target.laborat || '', resep: target.resep || '', status: target.status, 
+                            tglKontrol: target.tglKontrol || '', statusKontrol: target.statusKontrol || '-'
+                        };
+                        
+                        const { error } = await supabaseClient.from('pelayanan').update(dataToServer).match({ erm: target.erm, waktuDaftar: target.waktuDaftar });
+                        if (error) throw error;
+                        if(logRiwayat) await supabaseClient.from('riwayat').insert(logRiwayat);
                     } catch(err) {
                         showToast('Gagal server: '+err.message,'error');
                     }
@@ -1336,7 +1317,7 @@
 
         let pasienKasirAktif = null;
         function bukaFormKasir(erm) {
-            pasienKasirAktif = [...pelayananData].reverse().find(p => p.erm === erm); if(!pasienKasirAktif) return;
+            pasienKasirAktif = [...pelayananData].reverse().find(p => p.erm === erm && (p.status === 'antrean_kasir' || p.status === 'selesai_kasir')); if(!pasienKasirAktif) return;
             document.getElementById('info_nama_kasir').textContent = pasienKasirAktif.nama; document.getElementById('info_erm_kasir').textContent = pasienKasirAktif.erm;
             document.getElementById('info_resep_kasir').textContent = pasienKasirAktif.resep || '-';
             const inT = document.getElementById('input_tagihan_kasir'), btnS = document.getElementById('btnSimpanKasir'), btnC = document.getElementById('btnCetakStruk');
@@ -1350,7 +1331,7 @@
             const nom = document.getElementById('input_tagihan_kasir').value;
             if(!nom) { showToast('Masukkan nominal tagihan!', 'warning'); return; }
             if(pasienKasirAktif) {
-                const idx = pelayananData.findIndex(p => p.erm === pasienKasirAktif.erm);
+                const idx = pelayananData.findIndex(p => p.erm === pasienKasirAktif.erm && p.waktuDaftar === pasienKasirAktif.waktuDaftar);
                 if(idx !== -1) { pelayananData[idx].status = 'selesai_kasir'; pelayananData[idx].tagihan = nom; }
                 showToast(`Pembayaran LUNAS!`, 'success');
                 document.getElementById('input_tagihan_kasir').disabled = true; document.getElementById('btnSimpanKasir').classList.add('hidden'); document.getElementById('btnCetakStruk').classList.remove('hidden');
@@ -1359,10 +1340,10 @@
                 const vPelayananMedis = document.getElementById('view-pelayanan-medis');
                 if (vPelayananMedis && !vPelayananMedis.classList.contains('hidden')) renderTabelPelayananMedis();
 
-                if (SCRIPT_URL !== 'URL_GOOGLE_APPS_SCRIPT_WEB_APP_ANDA') {
+                if (supabaseClient) {
                     try {
-                        const dataToServer = { ...pelayananData[idx], tanggalSistem: new Date(pelayananData[idx].tanggalSistem).toISOString() };
-                        await apiCall('simpanPelayanan', dataToServer);
+                        const { error } = await supabaseClient.from('pelayanan').update({ status: 'selesai_kasir', tagihan: nom }).match({ erm: pasienKasirAktif.erm, waktuDaftar: pasienKasirAktif.waktuDaftar });
+                        if (error) throw error;
                     } catch(err) {
                         showToast('Gagal server: '+err.message, 'error');
                     }
