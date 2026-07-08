@@ -41,15 +41,15 @@
             font-size: 0.875rem; 
             width: 100%; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
-            background-color: #f1f5f9 !important; /* Latar abu-abu sangat muda */
-            box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.06), inset 0 1px 1px rgba(15, 23, 42, 0.03) !important; /* Efek Cekung Dalam */
+            background-color: #f1f5f9 !important; 
+            box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.06), inset 0 1px 1px rgba(15, 23, 42, 0.03) !important; 
             color: #334155; 
         }
         .form-input:focus { 
             outline: none !important; 
-            border-color: #0d9488 !important; /* Aksen Teal saat fokus */
+            border-color: #0d9488 !important; 
             background-color: #ffffff !important; 
-            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15), inset 0 1px 2px rgba(0,0,0,0.01) !important; /* Efek Pop-out & Glow */
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15), inset 0 1px 2px rgba(0,0,0,0.01) !important; 
             transform: translateY(-1px);
         }
         .form-input:read-only {
@@ -101,12 +101,10 @@
         <div id="login-card-white" class="login-card-white bg-white rounded-3xl shadow-2xl w-full max-w-sm px-6 py-8 border border-slate-100 relative z-10 transform transition-all hover:shadow-teal-500/20">
             <form onsubmit="handleLogin(event)" class="space-y-6">
                 
-                <!-- TEKS LOGO eRM.BPM -->
                 <div class="text-center w-full mb-2">
                     <h2 class="text-4xl font-black text-slate-800 tracking-tight drop-shadow-sm cursor-default inline-block transform transition-transform duration-300 hover:scale-110">eRM<span class="font-light text-teal-600">.BPM</span></h2>
                 </div>
                 
-                <!-- KOLOM INPUT -->
                 <div class="w-full">
                     <label class="form-label text-teal-600 text-[11px] uppercase tracking-widest font-extrabold mb-1">Username</label>
                     <div class="relative">
@@ -115,11 +113,9 @@
                     </div>
                 </div>
                 
-                <!-- TOMBOL LOGIN BERANIMASI -->
                 <button type="submit" class="w-full py-3.5 bg-gradient-brand text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-teal-500/40 transform hover:-translate-y-1 active:scale-95 active:shadow-inner transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden">
                     <span class="relative z-10 tracking-wide">Login</span> 
                     <i class="fas fa-sign-in-alt relative z-10 group-hover:translate-x-1.5 transition-transform duration-300"></i>
-                    <!-- Efek kilau cahaya saat di-hover -->
                     <div class="absolute inset-0 h-full w-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
                 </button>
             </form>
@@ -184,7 +180,6 @@
                                     <input type="text" id="form_tempat_lahir" placeholder="Kota Kelahiran" class="form-input uppercase">
                                 </div>
                                 <div>
-                                    <!-- INPUT TANGGAL LAHIR (FLATPICKR) -->
                                     <label class="form-label">Tanggal Lahir</label>
                                     <div class="relative">
                                         <i class="fas fa-calendar-alt absolute left-3.5 top-2.5 text-teal-500 z-10"></i>
@@ -399,31 +394,66 @@
 
                 <div class="flex flex-col gap-1.5 mb-4">
                     <label class="text-xs font-bold text-slate-700">Total Nominal (Rp):</label>
-                    <!-- Input Tagihan Kasir, formatRupiah terpasang pada oninput -->
                     <input type="text" inputmode="numeric" id="input_tagihan_kasir" oninput="formatRupiah(this)" placeholder="0" class="form-input text-right font-extrabold text-orange-600 text-xl md:text-2xl py-2 md:py-3 border-orange-300 focus:border-orange-500" autocomplete="off">
                 </div>
             </div>
 
             <div class="shrink-0 flex justify-end gap-2 mt-2 pt-3 border-t border-slate-100">
-                <button onclick="tutupFormKasir()" class="px-4 py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition w-1/3">Tutup</button>
-                <button id="btnSimpanKasir" onclick="simpanDataKasir()" class="px-4 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold hover:shadow-lg transition-transform transform hover:-translate-y-0.5 flex-1 flex justify-center items-center gap-2">
+                <button onclick="tutupFormKasir()" class="px-4 py-2 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition w-1/3">Tutup</button>
+                <button id="btnSimpanKasir" onclick="simpanDataKasir()" class="px-4 py-2 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition flex-1 flex justify-center items-center gap-2">
                     <i class="fas fa-check-circle"></i> Selesaikan
                 </button>
-                <button id="btnCetakStruk" onclick="cetakStrukKasir()" class="hidden px-4 py-2.5 bg-gradient-to-r from-slate-700 to-slate-900 text-white rounded-xl font-bold hover:shadow-lg transition-transform transform hover:-translate-y-0.5 flex-1 justify-center items-center gap-2">
+                <button id="btnCetakStruk" onclick="cetakStrukKasir()" class="hidden px-4 py-2 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition flex-1 justify-center items-center gap-2">
                     <i class="fas fa-print"></i> Cetak Struk
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL FORM PETUGAS -->
+    <div id="modalPetugas" class="fixed inset-0 bg-slate-900/60 z-[160] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalPetugasContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[400px] modal-enter border border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 border-b border-slate-100 pb-3" id="titleModalPetugas"><i class="fas fa-edit mr-2 text-indigo-500"></i> Edit Petugas</h3>
+            <form onsubmit="simpanPetugas(event)" class="space-y-4">
+                <input type="hidden" id="form_petugas_old_username">
+                <div>
+                    <label class="form-label">Username <span class="text-rose-500">*</span></label>
+                    <input type="text" id="form_petugas_username" required class="form-input" placeholder="Misal: admin, respsionis1">
+                </div>
+                <div>
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" id="form_petugas_nama" class="form-input uppercase" placeholder="Nama asli petugas">
+                </div>
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="sembunyikanModal('modalPetugas', 'modalPetugasContent')" class="px-5 py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-0.5"><i class="fas fa-save mr-2"></i> Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI HAPUS DATA USANG -->
+    <div id="modalHapusData" class="fixed inset-0 bg-slate-900/60 z-[170] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalHapusDataContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[420px] modal-enter text-center border border-rose-200 flex flex-col">
+            <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-rose-50 mb-6 border-8 border-white shadow-md relative -top-12">
+                <i class="fas fa-trash-alt text-3xl text-rose-500"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2 -mt-8">Hapus Data Permanen!</h3>
+            <p class="text-sm text-slate-500 mb-8 leading-relaxed" id="teksHapusData"></p>
+            <div class="flex justify-center gap-3 w-full shrink-0">
+                <button onclick="sembunyikanModal('modalHapusData', 'modalHapusDataContent')" class="px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2">Batal</button>
+                <button id="btnEksekusiHapus" onclick="eksekusiHapusData()" class="px-4 py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 hover:shadow-lg shadow-sm transition transform hover:scale-105 w-1/2 flex justify-center items-center"><i class="fas fa-trash-alt mr-2"></i> Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR PREMIUM -->
-    <nav class="shrink-0 bg-gradient-brand text-white shadow-lg z-50 border-b border-teal-800/50 opacity-0 transform translate-y-10" id="main-nav">
-        <!-- FULL WIDTH CONTAINER -->
+    <nav class="shrink-0 bg-gradient-brand text-white shadow-lg z-50 border-b border-teal-800/50">
         <div class="w-full flex justify-between items-center px-4 md:px-6">
             <div class="flex flex-wrap items-center py-2 md:py-3 w-full">
-                <!-- LOGO -->
-                <div class="pr-4 md:pr-8 border-r border-teal-600/50 cursor-pointer flex items-center gap-2 md:gap-3 shrink-0 group">
-                    <div class="text-2xl font-black tracking-tighter text-white drop-shadow-md transform transition-transform duration-300 group-hover:scale-110 inline-block">
+                <!-- LOGO TEXT -->
+                <div class="pr-4 md:pr-8 border-r border-teal-600/50 cursor-pointer flex items-center shrink-0">
+                    <div class="text-xl md:text-2xl font-black tracking-tighter text-white drop-shadow-md transform transition-transform duration-300 hover:scale-110">
                         eRM<span class="font-light text-teal-200 ml-0.5">.BPM</span>
                     </div>
                 </div>
@@ -559,7 +589,6 @@
                 </h1>
                 <div class="flex items-center gap-2 bg-white p-1 rounded-lg border border-blue-200 shadow-sm w-full sm:w-auto">
                     <label class="text-[10px] font-bold text-blue-800 px-2 uppercase tracking-wider shrink-0"><i class="far fa-calendar-alt mr-1"></i> Tgl:</label>
-                    <!-- Input Filter Tanggal dengan Flatpickr -->
                     <input type="text" id="filter_tgl_medis" class="form-input py-1 px-2 text-xs font-semibold text-blue-700 border-none focus:ring-0 cursor-pointer w-full sm:w-auto bg-blue-50/30 rounded-md shadow-none" style="box-shadow: none !important;">
                 </div>
             </div>
@@ -693,11 +722,12 @@
                 </h1>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-4 md:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 max-w-5xl">
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 max-w-6xl mx-auto">
+                    
+                    <!-- PENGATURAN STRUK -->
                     <div class="border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm bg-white">
                         <h3 class="font-bold text-slate-700 mb-4 border-b border-slate-100 pb-2"><i class="fas fa-print text-blue-500 mr-2"></i> Pengaturan Struk Kasir</h3>
-                        
                         <div class="space-y-4">
                             <div>
                                 <label class="form-label text-xs">Nama / Kop Klinik</label>
@@ -712,10 +742,44 @@
                                 <textarea id="set_struk_footer" rows="2" class="form-input text-slate-600">Terima Kasih, Semoga Lekas Sembuh</textarea>
                             </div>
                             <div class="pt-2">
-                                <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 shadow-sm transition-all">Simpan Template Struk</button>
+                                <button onclick="simpanPengaturanStruk()" class="w-full py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 shadow-sm transition-all transform hover:-translate-y-0.5"><i class="fas fa-save mr-2"></i> Simpan Template Struk</button>
                             </div>
                         </div>
                     </div>
+
+                    <!-- MANAJEMEN PETUGAS -->
+                    <div class="border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm bg-white flex flex-col h-[400px]">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2 shrink-0">
+                            <h3 class="font-bold text-slate-700"><i class="fas fa-users-cog text-indigo-500 mr-2"></i> Manajemen Petugas</h3>
+                            <button onclick="bukaModalEditPetugas('')" class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-colors flex items-center shadow-sm"><i class="fas fa-plus mr-1"></i> User Baru</button>
+                        </div>
+                        <div class="flex-1 overflow-auto border border-slate-100 rounded-xl bg-slate-50">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead class="text-[10px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-100 shadow-sm">
+                                    <tr><th class="p-3">Username</th><th class="p-3">Nama Lengkap</th><th class="p-3 text-center w-20">Aksi</th></tr>
+                                </thead>
+                                <tbody id="tablePetugasList" class="text-xs text-slate-600 divide-y divide-slate-100 bg-white"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- PEMBERSIHAN DATA (MAINTENANCE) -->
+                    <div class="border border-rose-200 rounded-2xl p-4 md:p-6 shadow-sm bg-white col-span-1 lg:col-span-2 border-l-4 border-l-rose-500">
+                        <h3 class="font-bold text-rose-700 mb-2 border-b border-rose-100 pb-2"><i class="fas fa-database text-rose-500 mr-2"></i> Pembersihan Database (Maintenance)</h3>
+                        <p class="text-xs md:text-sm text-slate-500 mb-4 md:mb-5 leading-relaxed">Fitur ini akan menganalisa pasien yang sudah lama tidak kembali berobat/kontrol. Anda dapat mengosongkan beban server dengan menghapus <b>seluruh data rekam medis, antrean, dan master data pasien</b> tersebut secara permanen.</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 md:gap-4 items-center bg-rose-50/50 p-4 rounded-xl border border-rose-100">
+                            <label class="text-xs font-bold text-rose-800 uppercase tracking-wider shrink-0 w-full sm:w-auto">Batas Waktu Terakhir:</label>
+                            <select id="set_rentang_hapus" class="form-input font-bold text-rose-600 w-full sm:flex-1 border-rose-200 focus:border-rose-500 shadow-inner">
+                                <option value="">- Pilih Rentang Tidak Aktif -</option>
+                                <option value="6">Pasien tidak berobat > 6 Bulan</option>
+                                <option value="12">Pasien tidak berobat > 1 Tahun</option>
+                                <option value="24">Pasien tidak berobat > 2 Tahun</option>
+                            </select>
+                            <button onclick="konfirmasiHapusData()" class="w-full sm:w-auto px-6 py-2.5 bg-rose-600 text-white text-sm font-bold rounded-xl hover:bg-rose-700 transition shadow-sm whitespace-nowrap transform hover:scale-105"><i class="fas fa-eraser mr-2"></i> Analisa & Hapus</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -730,6 +794,8 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
     <script>
+        // --- STREAMING_CHUNK:Initializing Application Settings & Logic ---
+        
         // --- Sistem Konfigurasi & Backend URL (Supabase) ---
         const SUPABASE_URL = 'https://sxywrxbtwaxnymscumql.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4eXdyeGJ0d2F4bnltc2N1bXFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNjQ3ODgsImV4cCI6MjA5ODk0MDc4OH0.sMVmMW3uTrkE07if1C566FuBmk26iKieubFGFygX4UU';
@@ -767,27 +833,43 @@
         let editPasienIndex = -1;
         let kalenderMedisInstance = null;
         let fpTglLahir = null; 
+        let petugasDataGlobal = [];
 
+        // --- Konfigurasi Sistem ---
         let appConfig = {
             strukKop: 'eRM BPM CLINIC',
             strukAlamat: 'Struk Resmi',
             strukFooter: 'Terima Kasih, Semoga Lekas Sembuh'
         };
 
-        // --- Sistem Autentikasi / Login Animasi ---
+        // --- STREAMING_CHUNK:Configuring User Authentication ---
+        // --- Sistem Autentikasi / Login ---
         let currentUserId = localStorage.getItem('erm_user_id') || '';
         let currentUsername = localStorage.getItem('erm_username') || '';
 
-        function checkAuth(isLoginAction = false) {
+        function checkAuth() {
             const loginOverlay = document.getElementById('login-overlay');
             const navLaporan = document.getElementById('nav_laporan');
             const navPengaturan = document.getElementById('nav_pengaturan');
-            const navApp = document.getElementById('main-nav');
-            const mainApp = document.getElementById('main-container');
 
             if (currentUserId && currentUsername) {
+                // Tampilan Split Animasi (jika baru login) atau langsung sembunyi
+                loginOverlay.classList.add('login-leave');
+                setTimeout(() => {
+                    loginOverlay.classList.add('hidden');
+                    loginOverlay.classList.remove('login-leave');
+                }, 800);
+                
                 document.getElementById('nav_username_display').textContent = currentUsername;
                 
+                // Menampilkan Dashboard dengan animasi
+                const mainContainer = document.getElementById('main-container');
+                if (mainContainer) {
+                    mainContainer.classList.remove('opacity-0', 'translate-y-10');
+                    mainContainer.classList.add('app-enter');
+                }
+
+                // --- PENGATURAN HAK AKSES UI ---
                 if (currentUserId === 'admin') {
                     if(navLaporan) navLaporan.classList.remove('hidden');
                     if(navPengaturan) navPengaturan.classList.remove('hidden');
@@ -796,46 +878,22 @@
                     if(navPengaturan) navPengaturan.classList.add('hidden');
                 }
                 
-                // Menjalankan animasi halus
-                if (isLoginAction) {
-                    const bgGreen = document.getElementById('login-bg-green');
-                    const cardWhite = document.getElementById('login-card-white');
-                    
-                    if (bgGreen) bgGreen.classList.add('split-up');
-                    if (cardWhite) cardWhite.classList.add('split-down');
-                    
-                    // Fade out background slightly delayed for smooth curtain effect
-                    setTimeout(() => {
-                        loginOverlay.classList.add('opacity-0');
-                    }, 400);
-
-                    setTimeout(() => {
-                        loginOverlay.classList.add('hidden');
-                        loginOverlay.classList.remove('opacity-0');
-                        if (bgGreen) bgGreen.classList.remove('split-up'); // reset for future logout
-                        if (cardWhite) cardWhite.classList.remove('split-down'); // reset for future logout
-                        
-                        navApp.classList.add('app-enter');
-                        mainApp.classList.add('app-enter');
-                        
-                        setTimeout(() => {
-                            navApp.classList.remove('app-enter');
-                            mainApp.classList.remove('app-enter');
-                            navApp.style.opacity = '1'; navApp.style.transform = 'translateY(0)';
-                            mainApp.style.opacity = '1'; mainApp.style.transform = 'translateY(0)';
-                        }, 800);
-                    }, 900); // Sinkron dengan durasi transisi css (900ms)
-                } else {
-                    loginOverlay.classList.add('hidden');
-                    navApp.style.opacity = '1'; navApp.style.transform = 'translateY(0)';
-                    mainApp.style.opacity = '1'; mainApp.style.transform = 'translateY(0)';
-                }
-                
                 fetchDataDariSpreadsheet();
             } else {
-                loginOverlay.classList.remove('hidden', 'login-leave');
-                navApp.style.opacity = '0'; navApp.style.transform = 'translateY(10px)';
-                mainApp.style.opacity = '0'; mainApp.style.transform = 'translateY(10px)';
+                loginOverlay.classList.remove('hidden');
+                
+                // Reset animasi
+                const mainContainer = document.getElementById('main-container');
+                if (mainContainer) {
+                    mainContainer.classList.remove('app-enter');
+                    mainContainer.classList.add('opacity-0', 'translate-y-10');
+                }
+                
+                const bgGreen = document.getElementById('login-bg-green');
+                const cardWhite = document.getElementById('login-card-white');
+                if (bgGreen) bgGreen.classList.remove('split-up');
+                if (cardWhite) cardWhite.classList.remove('split-down');
+                
                 document.getElementById('login_username').value = '';
             }
         }
@@ -852,7 +910,7 @@
 
             const btnSubmit = e.target.querySelector('button[type="submit"]');
             const originalBtnText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memeriksa...';
             btnSubmit.disabled = true;
 
             if (supabaseClient) {
@@ -877,7 +935,15 @@
                         localStorage.setItem('erm_username', currentUsername);
                         showToast(`Selamat bekerja, ${currentUsername}!`, 'success');
                         
-                        checkAuth(true); // Panggil fungsi animasi dengan TRUE
+                        // Eksekusi Animasi Split
+                        const bgGreen = document.getElementById('login-bg-green');
+                        const cardWhite = document.getElementById('login-card-white');
+                        if (bgGreen) bgGreen.classList.add('split-up');
+                        if (cardWhite) cardWhite.classList.add('split-down');
+                        
+                        setTimeout(() => {
+                            checkAuth();
+                        }, 600);
                     }
                 } catch(err) {
                     showToast('Gagal memverifikasi login: ' + err.message, 'error');
@@ -886,7 +952,22 @@
                     btnSubmit.disabled = false;
                 }
             } else {
-                showToast('Konfigurasi Supabase belum diisi. Sistem dikunci!', 'error');
+                // FALLBACK LOKAL UNTUK TESTING
+                currentUserId = username.toLowerCase();
+                currentUsername = username;
+                localStorage.setItem('erm_user_id', currentUserId);
+                localStorage.setItem('erm_username', currentUsername);
+                showToast(`Mode Lokal: Selamat bekerja, ${currentUsername}!`, 'success');
+                
+                const bgGreen = document.getElementById('login-bg-green');
+                const cardWhite = document.getElementById('login-card-white');
+                if (bgGreen) bgGreen.classList.add('split-up');
+                if (cardWhite) cardWhite.classList.add('split-down');
+                
+                setTimeout(() => {
+                    checkAuth();
+                }, 600);
+                
                 btnSubmit.innerHTML = originalBtnText;
                 btnSubmit.disabled = false;
             }
@@ -916,6 +997,8 @@
             checkAuth();
         }
 
+        // --- STREAMING_CHUNK:Configuring App Navigation & View Controller ---
+        // --- Logika Akses / Pindah View ---
         function switchView(view) {
             if (currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'pengaturan')) {
                 showToast('Akses Ditolak! Hanya Admin yang dapat membuka menu ini.', 'error');
@@ -944,6 +1027,170 @@
             if (view === 'jadwal_kontrol') renderJadwalKontrol();
             if (view === 'laporan_kunjungan') renderLaporanKunjungan();
             if (view === 'laporan_keuangan') renderLaporanKeuangan();
+            if (view === 'pengaturan') fetchPetugasKePengaturan();
+        }
+
+        // --- STREAMING_CHUNK:Implementing Database Maintenance & Officers Control ---
+        // --- Logika Manajemen Petugas & Pengaturan ---
+        async function fetchPetugasKePengaturan() {
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('petugas').select('*');
+                    if (error) throw error;
+                    petugasDataGlobal = data;
+                    renderTabelPetugas();
+                } catch(err) {
+                    showToast('Gagal memuat daftar petugas: ' + err.message, 'error');
+                }
+            }
+        }
+
+        function renderTabelPetugas() {
+            const tb = document.getElementById('tablePetugasList');
+            if(!tb) return;
+            tb.innerHTML = '';
+            
+            if(petugasDataGlobal.length === 0) {
+                tb.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada data.</td></tr>`; return;
+            }
+            
+            petugasDataGlobal.forEach((p, idx) => {
+                const isYou = p.username.toLowerCase() === currentUserId;
+                const badge = isYou ? `<span class="bg-emerald-100 text-emerald-700 text-[9px] px-2 py-0.5 rounded ml-2 font-bold uppercase">Anda</span>` : '';
+                tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-3 font-mono font-bold text-indigo-600">${p.username} ${badge}</td>
+                    <td class="p-3 font-semibold uppercase text-slate-700">${p.nama_lengkap || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalEditPetugas('${p.username}')" class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white transition-colors flex items-center justify-center"><i class="fas fa-edit"></i></button></td>
+                </tr>`;
+            });
+        }
+
+        function bukaModalEditPetugas(oldUsername) {
+            if (oldUsername) {
+                const pet = petugasDataGlobal.find(p => p.username === oldUsername);
+                document.getElementById('form_petugas_old_username').value = oldUsername;
+                document.getElementById('form_petugas_username').value = pet.username;
+                document.getElementById('form_petugas_nama').value = pet.nama_lengkap;
+                document.getElementById('titleModalPetugas').innerHTML = '<i class="fas fa-edit mr-2 text-indigo-500"></i> Edit Petugas';
+            } else {
+                document.getElementById('form_petugas_old_username').value = '';
+                document.getElementById('form_petugas_username').value = '';
+                document.getElementById('form_petugas_nama').value = '';
+                document.getElementById('titleModalPetugas').innerHTML = '<i class="fas fa-user-plus mr-2 text-indigo-500"></i> Petugas Baru';
+            }
+            tampilModal('modalPetugas', 'modalPetugasContent');
+        }
+
+        async function simpanPetugas(e) {
+            e.preventDefault();
+            const oldU = document.getElementById('form_petugas_old_username').value;
+            const newU = document.getElementById('form_petugas_username').value.trim();
+            const newN = document.getElementById('form_petugas_nama').value;
+
+            if(!newU) return;
+
+            if (supabaseClient) {
+                try {
+                    if (oldU) {
+                        const { error } = await supabaseClient.from('petugas').update({ username: newU, nama_lengkap: newN }).eq('username', oldU);
+                        if (error) throw error;
+                        showToast('Berhasil mengubah data akun petugas!', 'success');
+                        
+                        // Perbarui sesi saat ini jika Admin mengubah namanya sendiri
+                        if(oldU.toLowerCase() === currentUserId) {
+                            currentUserId = newU.toLowerCase();
+                            currentUsername = newN || newU;
+                            localStorage.setItem('erm_user_id', currentUserId);
+                            localStorage.setItem('erm_username', currentUsername);
+                            document.getElementById('nav_username_display').textContent = currentUsername;
+                        }
+                    } else {
+                        const { error } = await supabaseClient.from('petugas').insert({ username: newU, nama_lengkap: newN });
+                        if (error) throw error;
+                        showToast('Berhasil menambahkan akun petugas baru!', 'success');
+                    }
+                    sembunyikanModal('modalPetugas', 'modalPetugasContent');
+                    fetchPetugasKePengaturan();
+                } catch(err) {
+                    showToast('Gagal menyimpan akun: ' + err.message, 'error');
+                }
+            } else {
+                showToast('Fitur ini memerlukan koneksi Server aktif!', 'warning');
+            }
+        }
+
+        // --- Logika Pembersihan Database (Maintenance) ---
+        function konfirmasiHapusData() {
+            const bln = parseInt(document.getElementById('set_rentang_hapus').value);
+            if(!bln || isNaN(bln)) { showToast('Silakan pilih rentang waktu terlebih dahulu!', 'warning'); return; }
+            
+            const limitDate = new Date();
+            limitDate.setMonth(limitDate.getMonth() - bln);
+            limitDate.setHours(0,0,0,0);
+            
+            // 1. Simpan ERM dari pasien yang MASIH aktif (berobat / masuk antrean setelah limitDate)
+            let ermToKeep = new Set();
+            pelayananData.forEach(p => {
+                if(p.tanggalSistem) {
+                    const d = new Date(p.tanggalSistem);
+                    if(d >= limitDate) ermToKeep.add(p.erm);
+                }
+            });
+            
+            // 2. Tandai ERM pasien yang usang (Semua pasien yg pernah berobat, tapi TIDAK ADA di ermToKeep)
+            let ermToDelete = new Set();
+            pelayananData.forEach(p => {
+                if(!ermToKeep.has(p.erm)) {
+                    ermToDelete.add(p.erm);
+                }
+            });
+            
+            const countPasien = ermToDelete.size;
+            
+            if(countPasien === 0) {
+                showToast(`Data Aman! Tidak ada pasien yang tidak aktif selama ${bln >= 12 ? (bln/12)+' Tahun' : bln+' Bulan'}.`, 'success');
+                return;
+            }
+            
+            // Simpan ke variabel global untuk eksekusi
+            window.ermTargetDelete = Array.from(ermToDelete);
+            
+            document.getElementById('teksHapusData').innerHTML = `Sistem mendeteksi <b>${countPasien} Pasien</b> yang tidak pernah kontrol selama lebih dari ${bln >= 12 ? (bln/12)+' Tahun' : bln+' Bulan'}.<br><br>Seluruh data Master Pasien, Riwayat Pemeriksaan, Resep Obat, dan Antrean Kasir dari pasien tersebut akan <b>dihapus permanen</b> untuk membersihkan database.<br><br>Apakah Anda yakin?`;
+            
+            tampilModal('modalHapusData', 'modalHapusDataContent');
+        }
+
+        async function eksekusiHapusData() {
+            const erms = window.ermTargetDelete;
+            if(!erms || erms.length === 0) return;
+            
+            const btn = document.getElementById('btnEksekusiHapus');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menghapus...';
+            btn.disabled = true;
+
+            if (supabaseClient) {
+                try {
+                    const hapusRiwayat = supabaseClient.from('riwayat').delete().in('erm', erms);
+                    const hapusPelayanan = supabaseClient.from('pelayanan').delete().in('erm', erms);
+                    const hapusPasien = supabaseClient.from('pasien').delete().in('erm', erms);
+                    
+                    await Promise.all([hapusRiwayat, hapusPelayanan, hapusPasien]);
+                    
+                    showToast(`Pembersihan Selesai! ${erms.length} Data Pasien Usang terhapus permanen.`, 'success');
+                    sembunyikanModal('modalHapusData', 'modalHapusDataContent');
+                    
+                    fetchDataDariSpreadsheet();
+                } catch(err) {
+                    showToast('Gagal mengeksekusi penghapusan database: ' + err.message, 'error');
+                }
+            } else {
+                showToast('Fitur maintenance memerlukan koneksi Server aktif!', 'warning');
+            }
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i> Ya, Hapus';
+                btn.disabled = false;
+            }, 1000);
         }
 
         async function simpanConfigKeServer() {
@@ -966,6 +1213,7 @@
             showToast('Template Struk berhasil diperbarui!', 'success');
         }
 
+        // --- STREAMING_CHUNK:Setting up Components, Forms & Calendars ---
         function initTanggal() {
             if (!fpTglLahir) {
                 fpTglLahir = flatpickr("#form_tgl_lahir", {
@@ -1112,6 +1360,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Rendering Database into Tables ---
         function renderTabel(data) {
             const tb = document.getElementById('tableBody'); 
             if(!tb) return;
@@ -1215,6 +1464,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Implementing Workflows for Medis & Kasir ---
         function bukaRiwayatLengkap(erm) {
             const p = patientsData.find(x => x.erm === erm); if(!p) return;
             document.getElementById('riwayatNama').textContent = p.nama; document.getElementById('riwayatErm').textContent = p.erm;
@@ -1580,6 +1830,7 @@
             pw.document.close(); pw.focus(); setTimeout(() => { pw.print(); }, 500);
         }
 
+        // --- STREAMING_CHUNK:Preparing Reporting System ---
         function filterDataByDate(arr, startId, endId) {
             return arr.filter(i => { 
                 if(!i.tanggalSistem) return false; 
@@ -1702,7 +1953,7 @@
             }
         }
 
-        // Memulai Aplikasi
+        // --- STREAMING_CHUNK:Starting Application ---
         checkAuth();
     </script>
 </body>
