@@ -455,6 +455,25 @@
         </div>
     </div>
 
+    <!-- MODAL KONFIRMASI HAPUS PASIEN SPESIFIK -->
+    <div id="modalHapusPasien" class="fixed inset-0 bg-slate-900/60 z-[170] hidden flex justify-center items-center backdrop-blur-sm px-4">
+        <div id="modalHapusPasienContent" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-[420px] modal-enter text-center border border-rose-200 flex flex-col">
+            <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-rose-50 mb-6 border-8 border-white shadow-md relative -top-12">
+                <i class="fas fa-user-minus text-3xl text-rose-500"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-800 mb-2 -mt-8">Hapus Data Pasien</h3>
+            <p class="text-sm text-slate-500 mb-4 leading-relaxed">Anda akan menghapus permanen semua rekam medis dan data antrean dari <br><b id="teksHapusNamaPasien" class="text-slate-700 uppercase"></b>.</p>
+            <div class="bg-rose-50 p-4 rounded-xl border border-rose-100 mb-6 text-left shadow-inner">
+                <label class="block text-xs font-bold text-rose-700 mb-2">Ketik No. eRM (<span id="teksHapusErmPasien" class="font-mono"></span>) untuk konfirmasi:</label>
+                <input type="text" id="inputKonfirmasiErm" class="form-input text-center font-mono font-bold text-rose-600 focus:border-rose-500 uppercase tracking-widest" placeholder="Ketik eRM di sini..." autocomplete="off">
+            </div>
+            <div class="flex justify-center gap-3 w-full shrink-0">
+                <button onclick="tutupKonfirmasiHapusPasien()" class="px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition w-1/2">Batal</button>
+                <button id="btnEksekusiHapusPasien" onclick="eksekusiHapusPasienSpesifik()" class="px-4 py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 hover:shadow-lg shadow-sm transition transform hover:scale-105 w-1/2 flex justify-center items-center"><i class="fas fa-trash-alt mr-2"></i> Hapus</button>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR PREMIUM -->
     <nav class="shrink-0 bg-gradient-brand text-white shadow-lg z-50 border-b border-teal-800/50">
         <div class="w-full flex justify-between items-center px-4 md:px-6">
@@ -575,7 +594,7 @@
                     <thead class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 sticky top-0 z-10 shadow-sm border-b border-slate-200">
                         <tr>
                             <th class="p-3 text-center w-10">#</th>
-                            <th class="p-3 text-center w-[120px]">Tindakan</th>
+                            <th class="p-3 text-center w-[160px]">Tindakan</th>
                             <th class="p-3">No. eRM</th>
                             <th class="p-3">Nama Lengkap</th>
                             <th class="p-3">L/P</th>
@@ -1247,6 +1266,147 @@
             }, 1000);
         }
 
+        let pasienTargetDelete = null;
+
+        function bukaKonfirmasiHapusPasien(erm, nama) {
+            pasienTargetDelete = { erm, nama };
+            document.getElementById('teksHapusNamaPasien').textContent = nama;
+            document.getElementById('teksHapusErmPasien').textContent = erm;
+            document.getElementById('inputKonfirmasiErm').value = '';
+            tampilModal('modalHapusPasien', 'modalHapusPasienContent');
+        }
+
+        function tutupKonfirmasiHapusPasien() {
+            sembunyikanModal('modalHapusPasien', 'modalHapusPasienContent');
+            pasienTargetDelete = null;
+        }
+
+        async function eksekusiHapusPasienSpesifik() {
+            if (!pasienTargetDelete) return;
+            
+            const inputErm = document.getElementById('inputKonfirmasiErm').value.trim().toUpperCase();
+            if (inputErm !== pasienTargetDelete.erm) {
+                showToast('Nomor eRM tidak cocok! Penghapusan dibatalkan.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnEksekusiHapusPasien');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Proses...';
+            btn.disabled = true;
+
+            const targetErm = pasienTargetDelete.erm;
+
+            if (supabaseClient) {
+                try {
+                    // Menghapus data secara bertingkat di Supabase (tergantung Foreign Key di DB)
+                    const hapusRiwayat = supabaseClient.from('riwayat').delete().eq('erm', targetErm);
+                    const hapusPelayanan = supabaseClient.from('pelayanan').delete().eq('erm', targetErm);
+                    const hapusPasien = supabaseClient.from('pasien').delete().eq('erm', targetErm);
+                    
+                    await Promise.all([hapusRiwayat, hapusPelayanan, hapusPasien]);
+                    
+                    // Update state di Local
+                    patientsData = patientsData.filter(p => p.erm !== targetErm);
+                    pelayananData = pelayananData.filter(p => p.erm !== targetErm);
+                    riwayatMedisGlobal = riwayatMedisGlobal.filter(p => p.erm !== targetErm);
+                    
+                    showToast(`Data pasien ${pasienTargetDelete.nama} berhasil dihapus permanen.`, 'success');
+                    tutupKonfirmasiHapusPasien();
+                    
+                    // Render ulang komponen tabel
+                    renderTabel(patientsData);
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    renderJadwalKontrol();
+                    renderLaporanKunjungan();
+                    renderLaporanKeuangan();
+                    updateBadges();
+
+                } catch(err) {
+                    showToast('Gagal menghapus data: ' + err.message, 'error');
+                }
+            } else {
+                setTimeout(() => {
+                    // Fallback khusus untuk mode testing (Local)
+                    patientsData = patientsData.filter(p => p.erm !== targetErm);
+                    pelayananData = pelayananData.filter(p => p.erm !== targetErm);
+                    riwayatMedisGlobal = riwayatMedisGlobal.filter(p => p.erm !== targetErm);
+                    
+                    showToast(`Data pasien ${pasienTargetDelete.nama} berhasil dihapus (Local Mode).`, 'success');
+                    tutupKonfirmasiHapusPasien();
+                    
+                    renderTabel(patientsData);
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    renderJadwalKontrol();
+                    renderLaporanKunjungan();
+                    renderLaporanKeuangan();
+                    updateBadges();
+                }, 500);
+            }
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i> Hapus';
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        async function fetchDataDariSpreadsheet() {
+            const tb = document.getElementById('tableBody');
+            if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data Database...</td></tr>`;
+            
+            if (supabaseClient) {
+                try {
+                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
+                        supabaseClient.from('pengaturan').select('*'),
+                        supabaseClient.from('pasien').select('*').order('erm', { ascending: false }),
+                        supabaseClient.from('pelayanan').select('*'),
+                        supabaseClient.from('riwayat').select('*')
+                    ]);
+                    
+                    if (resConfig.error) throw resConfig.error;
+                    if (resPasien.error) throw resPasien.error;
+                    if (resPelayanan.error) throw resPelayanan.error;
+                    if (resRiwayat.error) throw resRiwayat.error;
+
+                    if (resConfig.data) {
+                        resConfig.data.forEach(item => {
+                            appConfig[item.key] = item.value;
+                        });
+                        document.getElementById('set_struk_kop').value = appConfig.strukKop || 'eRM BPM CLINIC';
+                        document.getElementById('set_struk_alamat').value = appConfig.strukAlamat || 'Struk Resmi';
+                        document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
+                    }
+                    
+                    if (resPasien.data) patientsData = resPasien.data;
+                    
+                    if (resPelayanan.data) {
+                        pelayananData = resPelayanan.data.map(p => {
+                            const pat = patientsData.find(x => x.erm === p.erm) || {};
+                            return { ...p, nama: pat.nama || p.nama, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
+                        });
+                    }
+                    
+                    if (resRiwayat.data) riwayatMedisGlobal = resRiwayat.data;
+                    
+                    renderTabel(patientsData);
+                    initKalenderMedis(); 
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    if(document.getElementById('view-jadwal-kontrol') && document.getElementById('view-jadwal-kontrol').classList.contains('hidden') === false) renderJadwalKontrol();
+                    updateBadges();
+                    showToast('Sinkronisasi Database Berhasil!', 'success');
+
+                } catch(err) {
+                    console.error("Terjadi kesalahan fatal saat sinkronisasi:", err);
+                    showToast('Gagal sinkronisasi data: ' + err.message, 'error');
+                    renderTabel(patientsData); 
+                }
+            } else {
+                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
+            }
+        }
+
         async function simpanConfigKeServer() {
             try {
                 if (supabaseClient) {
@@ -1525,6 +1685,7 @@
                             <button onclick="bukaKonfirmasi('${row.erm}')" class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-blue-400 to-blue-600 text-white hover:from-blue-500 hover:to-blue-700 shadow-md hover:shadow-lg rounded-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center" title="Daftar Pelayanan"><i class="fas fa-stethoscope text-xs md:text-sm"></i></button>
                             <button onclick="editPasien('${row.erm}')" class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 shadow-md hover:shadow-lg rounded-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center" title="Edit Data"><i class="fas fa-edit text-xs md:text-sm"></i></button>
                             <button onclick="bukaRiwayatLengkap('${row.erm}')" class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-indigo-400 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-700 shadow-md hover:shadow-lg rounded-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center" title="Riwayat Medis"><i class="fas fa-history text-xs md:text-sm"></i></button>
+                            <button onclick="bukaKonfirmasiHapusPasien('${row.erm}', '${row.nama.replace(/'/g, "\\'")}')" class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-rose-400 to-rose-600 text-white hover:from-rose-500 hover:to-rose-700 shadow-md hover:shadow-lg rounded-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center" title="Hapus Pasien"><i class="fas fa-trash-alt text-xs md:text-sm"></i></button>
                         </div>
                     </td>
                     <td class="p-3 md:p-4 font-mono font-semibold text-slate-500">${row.erm}</td>
@@ -1535,62 +1696,6 @@
                 `;
                 tb.appendChild(tr);
             });
-        }
-
-        async function fetchDataDariSpreadsheet() {
-            const tb = document.getElementById('tableBody');
-            if(tb) tb.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-teal-600 font-bold"><i class="fas fa-circle-notch fa-spin mr-2"></i> Sinkronisasi Data Database...</td></tr>`;
-            
-            if (supabaseClient) {
-                try {
-                    const [resConfig, resPasien, resPelayanan, resRiwayat] = await Promise.all([
-                        supabaseClient.from('pengaturan').select('*'),
-                        supabaseClient.from('pasien').select('*').order('erm', { ascending: false }),
-                        supabaseClient.from('pelayanan').select('*'),
-                        supabaseClient.from('riwayat').select('*')
-                    ]);
-                    
-                    if (resConfig.error) throw resConfig.error;
-                    if (resPasien.error) throw resPasien.error;
-                    if (resPelayanan.error) throw resPelayanan.error;
-                    if (resRiwayat.error) throw resRiwayat.error;
-
-                    if (resConfig.data) {
-                        resConfig.data.forEach(item => {
-                            appConfig[item.key] = item.value;
-                        });
-                        document.getElementById('set_struk_kop').value = appConfig.strukKop || 'eRM BPM CLINIC';
-                        document.getElementById('set_struk_alamat').value = appConfig.strukAlamat || 'Struk Resmi';
-                        document.getElementById('set_struk_footer').value = appConfig.strukFooter || 'Terima Kasih';
-                    }
-                    
-                    if (resPasien.data) patientsData = resPasien.data;
-                    
-                    if (resPelayanan.data) {
-                        pelayananData = resPelayanan.data.map(p => {
-                            const pat = patientsData.find(x => x.erm === p.erm) || {};
-                            return { ...p, nama: pat.nama || p.nama, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
-                        });
-                    }
-                    
-                    if (resRiwayat.data) riwayatMedisGlobal = resRiwayat.data;
-                    
-                    renderTabel(patientsData);
-                    initKalenderMedis(); 
-                    renderTabelPelayananMedis();
-                    renderTabelPelayananKasir();
-                    if(document.getElementById('view-jadwal-kontrol') && document.getElementById('view-jadwal-kontrol').classList.contains('hidden') === false) renderJadwalKontrol();
-                    updateBadges();
-                    showToast('Sinkronisasi Database Berhasil!', 'success');
-
-                } catch(err) {
-                    console.error("Terjadi kesalahan fatal saat sinkronisasi:", err);
-                    showToast('Gagal sinkronisasi data: ' + err.message, 'error');
-                    renderTabel(patientsData); 
-                }
-            } else {
-                setTimeout(() => { showToast('Mode Lokal. Silakan isi SUPABASE URL & KEY!', 'warning'); renderTabel(patientsData); initKalenderMedis();}, 800);
-            }
         }
 
         // --- STREAMING_CHUNK:Implementing Workflows for Medis & Kasir ---
