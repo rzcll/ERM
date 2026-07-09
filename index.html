@@ -191,12 +191,12 @@
 
                             <div>
                                 <label class="form-label">Usia Pasien</label>
-                                <div class="flex border border-slate-200 rounded-lg overflow-hidden bg-slate-50 shadow-inner">
-                                    <input type="number" id="umur_thn" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                <div class="flex border border-slate-200 rounded-lg overflow-hidden shadow-inner focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500 transition-all">
+                                    <input type="number" id="umur_thn" value="0" min="0" oninput="hitungTglLahirDariUmur()" class="w-full px-2 py-2 text-center bg-white text-teal-600 font-bold focus:outline-none hover:bg-slate-50 transition-colors" placeholder="0">
                                     <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Thn</div>
-                                    <input type="number" id="umur_bln" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <input type="number" id="umur_bln" value="0" min="0" max="11" oninput="hitungTglLahirDariUmur()" class="w-full px-2 py-2 text-center bg-white text-teal-600 font-bold focus:outline-none hover:bg-slate-50 transition-colors" placeholder="0">
                                     <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-x border-slate-200 font-medium">Bln</div>
-                                    <input type="number" id="umur_hr" value="0" readonly class="w-full px-2 py-2 text-center bg-transparent cursor-not-allowed text-teal-600 font-bold focus:outline-none">
+                                    <input type="number" id="umur_hr" value="0" min="0" max="31" oninput="hitungTglLahirDariUmur()" class="w-full px-2 py-2 text-center bg-white text-teal-600 font-bold focus:outline-none hover:bg-slate-50 transition-colors" placeholder="0">
                                     <div class="px-2 py-2 text-[10px] sm:text-xs text-slate-500 flex items-center bg-slate-100 border-l border-slate-200 font-medium">Hari</div>
                                 </div>
                             </div>
@@ -424,6 +424,13 @@
                 <div>
                     <label class="form-label">Nama Lengkap</label>
                     <input type="text" id="form_petugas_nama" class="form-input uppercase" placeholder="Nama asli petugas">
+                </div>
+                <div>
+                    <label class="form-label">Hak Akses (Role) <span class="text-rose-500">*</span></label>
+                    <select id="form_petugas_role" required class="form-input cursor-pointer">
+                        <option value="petugas">Petugas Biasa</option>
+                        <option value="admin">Administrator</option>
+                    </select>
                 </div>
                 <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
                     <button type="button" onclick="sembunyikanModal('modalPetugas', 'modalPetugasContent')" class="px-5 py-2.5 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition">Batal</button>
@@ -847,6 +854,7 @@
         // --- Sistem Autentikasi / Login ---
         let currentUserId = localStorage.getItem('erm_user_id') || '';
         let currentUsername = localStorage.getItem('erm_username') || '';
+        let currentUserRole = localStorage.getItem('erm_user_role') || '';
 
         function checkAuth() {
             const loginOverlay = document.getElementById('login-overlay');
@@ -871,7 +879,7 @@
                 }
 
                 // --- PENGATURAN HAK AKSES UI ---
-                if (currentUserId === 'admin') {
+                if (currentUserRole === 'admin' || currentUserId === 'admin') {
                     if(navLaporan) navLaporan.classList.remove('hidden');
                     if(navPengaturan) navPengaturan.classList.remove('hidden');
                 } else {
@@ -920,7 +928,7 @@
                 try {
                     const { data, error } = await supabaseClient
                         .from('petugas')
-                        .select('username, nama_lengkap')
+                        .select('username, nama_lengkap, role')
                         .ilike('username', username)
                         .maybeSingle();
 
@@ -934,8 +942,10 @@
                     } else {
                         currentUserId = data.username.toLowerCase();
                         currentUsername = data.nama_lengkap || data.username;
+                        currentUserRole = data.role || 'petugas';
                         localStorage.setItem('erm_user_id', currentUserId);
                         localStorage.setItem('erm_username', currentUsername);
+                        localStorage.setItem('erm_user_role', currentUserRole);
                         showToast(`Selamat bekerja, ${currentUsername}!`, 'success');
                         
                         // Eksekusi Animasi Split
@@ -958,8 +968,10 @@
                 // FALLBACK LOKAL UNTUK TESTING
                 currentUserId = username.toLowerCase();
                 currentUsername = username;
+                currentUserRole = currentUserId === 'admin' ? 'admin' : 'petugas';
                 localStorage.setItem('erm_user_id', currentUserId);
                 localStorage.setItem('erm_username', currentUsername);
+                localStorage.setItem('erm_user_role', currentUserRole);
                 showToast(`Mode Lokal: Selamat bekerja, ${currentUsername}!`, 'success');
                 
                 const bgGreen = document.getElementById('login-bg-green');
@@ -979,8 +991,10 @@
         function handleLogout() {
             currentUserId = '';
             currentUsername = '';
+            currentUserRole = '';
             localStorage.removeItem('erm_user_id');
             localStorage.removeItem('erm_username');
+            localStorage.removeItem('erm_user_role');
             
             const viewsList = ['pendaftaran', 'pelayanan-medis', 'pelayanan-kasir', 'jadwal-kontrol', 'laporan-kunjungan', 'laporan-keuangan', 'pengaturan'];
             viewsList.forEach(v => {
@@ -1003,7 +1017,7 @@
         // --- STREAMING_CHUNK:Configuring App Navigation & View Controller ---
         // --- Logika Akses / Pindah View ---
         function switchView(view) {
-            if (currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'pengaturan')) {
+            if (currentUserRole !== 'admin' && currentUserId !== 'admin' && (view === 'laporan_kunjungan' || view === 'laporan_keuangan' || view === 'pengaturan')) {
                 showToast('Akses Ditolak! Hanya Admin yang dapat membuka menu ini.', 'error');
                 return;
             }
@@ -1088,10 +1102,12 @@
             
             petugasDataGlobal.forEach((p, idx) => {
                 const isYou = p.username.toLowerCase() === currentUserId;
-                const badge = isYou ? `<span class="bg-emerald-100 text-emerald-700 text-[9px] px-2 py-0.5 rounded ml-2 font-bold uppercase">Anda</span>` : '';
+                const badgeYou = isYou ? `<span class="bg-emerald-100 text-emerald-700 text-[9px] px-2 py-0.5 rounded ml-1 font-bold uppercase">Anda</span>` : '';
+                const badgeRole = p.role === 'admin' ? `<span class="bg-rose-100 text-rose-700 text-[9px] px-2 py-0.5 rounded font-bold uppercase ml-2">Admin</span>` : `<span class="bg-slate-100 text-slate-600 text-[9px] px-2 py-0.5 rounded font-bold uppercase ml-2">Petugas</span>`;
+
                 tb.innerHTML += `<tr class="hover:bg-slate-50 transition-colors">
-                    <td class="p-3 font-mono font-bold text-indigo-600">${p.username} ${badge}</td>
-                    <td class="p-3 font-semibold uppercase text-slate-700">${p.nama_lengkap || '-'}</td>
+                    <td class="p-3 font-mono font-bold text-indigo-600">${p.username} ${badgeYou}</td>
+                    <td class="p-3 font-semibold uppercase text-slate-700">${p.nama_lengkap || '-'} ${badgeRole}</td>
                     <td class="p-3 text-center"><button onclick="bukaModalEditPetugas('${p.username}')" class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white transition-colors flex items-center justify-center"><i class="fas fa-edit"></i></button></td>
                 </tr>`;
             });
@@ -1103,11 +1119,13 @@
                 document.getElementById('form_petugas_old_username').value = oldUsername;
                 document.getElementById('form_petugas_username').value = pet.username;
                 document.getElementById('form_petugas_nama').value = pet.nama_lengkap;
+                document.getElementById('form_petugas_role').value = pet.role || 'petugas';
                 document.getElementById('titleModalPetugas').innerHTML = '<i class="fas fa-edit mr-2 text-indigo-500"></i> Edit Petugas';
             } else {
                 document.getElementById('form_petugas_old_username').value = '';
                 document.getElementById('form_petugas_username').value = '';
                 document.getElementById('form_petugas_nama').value = '';
+                document.getElementById('form_petugas_role').value = 'petugas';
                 document.getElementById('titleModalPetugas').innerHTML = '<i class="fas fa-user-plus mr-2 text-indigo-500"></i> Petugas Baru';
             }
             tampilModal('modalPetugas', 'modalPetugasContent');
@@ -1118,26 +1136,30 @@
             const oldU = document.getElementById('form_petugas_old_username').value;
             const newU = document.getElementById('form_petugas_username').value.trim();
             const newN = document.getElementById('form_petugas_nama').value;
+            const newRole = document.getElementById('form_petugas_role').value;
 
             if(!newU) return;
 
             if (supabaseClient) {
                 try {
                     if (oldU) {
-                        const { error } = await supabaseClient.from('petugas').update({ username: newU, nama_lengkap: newN }).eq('username', oldU);
+                        const { error } = await supabaseClient.from('petugas').update({ username: newU, nama_lengkap: newN, role: newRole }).eq('username', oldU);
                         if (error) throw error;
                         showToast('Berhasil mengubah data akun petugas!', 'success');
                         
-                        // Perbarui sesi saat ini jika Admin mengubah namanya sendiri
+                        // Perbarui sesi saat ini jika Anda mengubah hak akses Anda sendiri
                         if(oldU.toLowerCase() === currentUserId) {
                             currentUserId = newU.toLowerCase();
                             currentUsername = newN || newU;
+                            currentUserRole = newRole;
                             localStorage.setItem('erm_user_id', currentUserId);
                             localStorage.setItem('erm_username', currentUsername);
+                            localStorage.setItem('erm_user_role', currentUserRole);
                             document.getElementById('nav_username_display').textContent = currentUsername;
+                            checkAuth();
                         }
                     } else {
-                        const { error } = await supabaseClient.from('petugas').insert({ username: newU, nama_lengkap: newN });
+                        const { error } = await supabaseClient.from('petugas').insert({ username: newU, nama_lengkap: newN, role: newRole });
                         if (error) throw error;
                         showToast('Berhasil menambahkan akun petugas baru!', 'success');
                     }
@@ -1272,6 +1294,27 @@
             if (bulan < 0 || (bulan === 0 && hari < 0)) { tahun--; bulan += (bulan < 0) ? 12 : 11; }
             if (hari < 0) { const hariBulanLalu = new Date(hariIni.getFullYear(), hariIni.getMonth(), 0).getDate(); hari += hariBulanLalu; }
             document.getElementById('umur_thn').value = tahun; document.getElementById('umur_bln').value = bulan; document.getElementById('umur_hr').value = hari;
+        }
+
+        function hitungTglLahirDariUmur() {
+            const thn = parseInt(document.getElementById('umur_thn').value) || 0;
+            const bln = parseInt(document.getElementById('umur_bln').value) || 0;
+            const hr = parseInt(document.getElementById('umur_hr').value) || 0;
+
+            // Jika nilai usia diubah menjadi 0 semua, maka hapus tanggal
+            if(thn === 0 && bln === 0 && hr === 0) {
+                if(fpTglLahir) fpTglLahir.clear(false); 
+                return;
+            }
+            
+            const hariIni = new Date();
+            // Kalkulasi mundur dari tanggal hari ini berdasarkan usia yang dimasukkan
+            const estTglLahir = new Date(hariIni.getFullYear() - thn, hariIni.getMonth() - bln, hariIni.getDate() - hr);
+            
+            if (fpTglLahir) {
+                // Set parameter kedua ke "false" agar tidak memicu onChange yang akan menghitung ulang usia
+                fpTglLahir.setDate(estTglLahir, false);
+            }
         }
 
         function initKalenderMedis() {
