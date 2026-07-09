@@ -97,8 +97,9 @@
 
     <!-- LOGIN OVERLAY -->
     <div id="login-overlay" class="fixed inset-0 z-[400] bg-slate-50 flex items-center justify-center p-4 transition-opacity duration-500">
-        <div id="login-bg-green" class="login-bg-green absolute top-0 left-0 w-full h-[40vh] bg-gradient-brand rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg"></div>
-        <div id="login-card-white" class="login-card-white bg-white rounded-3xl shadow-2xl w-full max-w-sm px-6 py-8 border border-slate-100 relative z-10 transform transition-all hover:shadow-teal-500/20">
+        <div id="login-bg-green" class="login-bg-green absolute top-0 left-0 w-full h-[40vh] bg-gradient-brand rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg flex items-center justify-center overflow-hidden">
+        </div>
+        <div id="login-card-white" class="login-card-white bg-white/40 backdrop-blur-xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] w-full max-w-sm px-6 py-8 border border-white/50 relative z-10 transform transition-all hover:shadow-[0_25px_50px_rgba(0,0,0,0.5)]">
             <form onsubmit="handleLogin(event)" class="space-y-6">
                 
                 <div class="text-center w-full mb-2">
@@ -461,13 +462,13 @@
                 <!-- MENU NAVIGATION -->
                 <ul class="flex font-semibold text-xs md:text-[13px] ml-2 md:ml-6 gap-1 md:gap-2 flex-wrap">
                     <li>
-                        <button onclick="switchView('pendaftaran')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
+                        <button id="btn_nav_pendaftaran" onclick="switchView('pendaftaran')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
                             <i class="fas fa-address-card text-teal-200"></i> <span class="hidden sm:inline">Pendaftaran</span>
                         </button>
                     </li>
                     
                     <li class="relative group">
-                        <button class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
+                        <button id="btn_nav_pelayanan" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
                             <i class="fas fa-stethoscope text-teal-200"></i> <span class="hidden sm:inline">Pelayanan</span>
                             <span id="badgePelayanan" class="hidden bg-rose-500 text-white text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-full shadow-sm">0</span> 
                             <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
@@ -494,7 +495,7 @@
                     </li>
 
                     <li>
-                        <button onclick="switchView('jadwal_kontrol')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white relative">
+                        <button id="btn_nav_jadwal_kontrol" onclick="switchView('jadwal_kontrol')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white relative">
                             <i class="fas fa-calendar-check text-teal-200"></i> 
                             <span class="hidden sm:inline">Jadwal Kontrol</span>
                             <span id="badgeJadwal" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full shadow-sm ml-1">0</span>
@@ -502,7 +503,7 @@
                     </li>
                     
                     <li id="nav_laporan" class="relative group">
-                        <button class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
+                        <button id="btn_nav_laporan" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 flex items-center gap-2 focus:outline-none text-white/90 hover:text-white">
                             <i class="fas fa-chart-pie text-teal-200"></i> <span class="hidden sm:inline">Laporan</span>
                             <i class="fas fa-chevron-down text-[10px] opacity-70 transition-transform duration-300 group-hover:rotate-180"></i>
                         </button>
@@ -522,7 +523,7 @@
                     </li>
 
                     <li id="nav_pengaturan">
-                        <button onclick="switchView('pengaturan')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
+                        <button id="btn_nav_pengaturan" onclick="switchView('pengaturan')" class="px-3 md:px-5 py-2 md:py-2.5 rounded-xl hover:bg-white/15 transition-all duration-200 focus:outline-none flex items-center gap-2 text-white/90 hover:text-white">
                             <i class="fas fa-cog text-teal-200"></i> <span class="hidden sm:inline">Setting</span>
                         </button>
                     </li>
@@ -879,6 +880,8 @@
                 }
                 
                 fetchDataDariSpreadsheet();
+                // Set highlight awal pada menu Pendaftaran
+                switchView('pendaftaran');
             } else {
                 loginOverlay.classList.remove('hidden');
                 
@@ -1020,6 +1023,35 @@
             if(targetView) {
                 targetView.classList.remove('hidden');
                 targetView.classList.add('flex');
+            }
+
+            // Fitur: Menambahkan Effect Active (Shadow, Ring & Scale) pada Menu Navbar
+            const navIds = ['btn_nav_pendaftaran', 'btn_nav_pelayanan', 'btn_nav_jadwal_kontrol', 'btn_nav_laporan', 'btn_nav_pengaturan'];
+            
+            // Hapus status aktif dari semua menu dan kembalikan ke default
+            navIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('bg-white/25', 'shadow-[0_4px_12px_rgba(0,0,0,0.25)]', 'ring-1', 'ring-white/50', 'text-white', 'scale-105', 'transform');
+                    el.classList.add('hover:bg-white/15', 'text-white/90');
+                }
+            });
+
+            // Tentukan tombol utama mana yang aktif berdasarkan parameter view
+            let activeId = '';
+            if (view === 'pendaftaran') activeId = 'btn_nav_pendaftaran';
+            else if (view.startsWith('pelayanan')) activeId = 'btn_nav_pelayanan';
+            else if (view === 'jadwal_kontrol') activeId = 'btn_nav_jadwal_kontrol';
+            else if (view.startsWith('laporan')) activeId = 'btn_nav_laporan';
+            else if (view === 'pengaturan') activeId = 'btn_nav_pengaturan';
+
+            // Beri highlight (Shadow) pada menu yang aktif
+            if (activeId) {
+                const activeEl = document.getElementById(activeId);
+                if (activeEl) {
+                    activeEl.classList.remove('hover:bg-white/15', 'text-white/90');
+                    activeEl.classList.add('bg-white/25', 'shadow-[0_4px_12px_rgba(0,0,0,0.25)]', 'ring-1', 'ring-white/50', 'text-white', 'scale-105', 'transform');
+                }
             }
 
             if (view === 'pelayanan_medis') renderTabelPelayananMedis();
@@ -1344,23 +1376,77 @@
                 try {
                     const { error } = await supabaseClient.from('pasien').upsert(dataObj, { onConflict: 'erm' });
                     if (error) throw error;
+                    
+                    // NEW: Memastikan Database Pelayanan juga ikut terganti namanya agar sinkron
+                    await supabaseClient.from('pelayanan').update({ nama: dataObj.nama }).eq('erm', dataObj.erm);
+
                     showToast(`Data ${dataObj.nama} berhasil disimpan ke Server!`, 'success');
                     tutupFormBaru();
+
+                    // Update UI Data Master
+                    if (editPasienIndex === -1) { patientsData.unshift(dataObj); } 
+                    else { patientsData[editPasienIndex] = dataObj; }
+
+                    // Menerapkan perubahan secara instan pada seluruh UI Antrean/Laporan yang memuat pasien ini
+                    pelayananData.forEach((pel, i) => {
+                        if(pel.erm === dataObj.erm) {
+                            pelayananData[i].nama = dataObj.nama;
+                            pelayananData[i].no_wa = dataObj.no_wa;
+                            pelayananData[i].jk = dataObj.jk;
+                            pelayananData[i].alamat = dataObj.alamat;
+                            pelayananData[i].rt = dataObj.rt;
+                            pelayananData[i].rw = dataObj.rw;
+                            pelayananData[i].kel = dataObj.kel;
+                            pelayananData[i].ttl = dataObj.ttl;
+                        }
+                    });
+
+                    // Render ulang seluruh tabel secara instan (UX Halus)
+                    renderTabel(patientsData);
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    renderJadwalKontrol();
+                    renderLaporanKunjungan();
+                    renderLaporanKeuangan();
+
                     fetchDataDariSpreadsheet(); 
                 } catch(err) {
                     showToast('Gagal menyimpan: ' + err.message, 'error');
                 }
             } else {
                 setTimeout(() => {
+                    // Update UI Data Master Lokal
                     if (editPasienIndex === -1) { patientsData.unshift(dataObj); } 
                     else { patientsData[editPasienIndex] = dataObj; }
+                    
+                    // Menerapkan perubahan secara instan pada seluruh UI Antrean/Laporan
+                    pelayananData.forEach((pel, i) => {
+                        if(pel.erm === dataObj.erm) {
+                            pelayananData[i].nama = dataObj.nama;
+                            pelayananData[i].no_wa = dataObj.no_wa;
+                            pelayananData[i].jk = dataObj.jk;
+                            pelayananData[i].alamat = dataObj.alamat;
+                            pelayananData[i].rt = dataObj.rt;
+                            pelayananData[i].rw = dataObj.rw;
+                            pelayananData[i].kel = dataObj.kel;
+                            pelayananData[i].ttl = dataObj.ttl;
+                        }
+                    });
+
+                    // Render ulang seluruh tabel secara instan
+                    renderTabel(patientsData);
+                    renderTabelPelayananMedis();
+                    renderTabelPelayananKasir();
+                    renderJadwalKontrol();
+                    renderLaporanKunjungan();
+                    renderLaporanKeuangan();
+
                     showToast(`Data ${dataObj.nama} tersimpan (Local Mode)!`, 'success');
-                    tutupFormBaru(); renderTabel(patientsData);
+                    tutupFormBaru(); 
                 }, 500);
             }
         }
 
-        // --- STREAMING_CHUNK:Rendering Database into Tables ---
         function renderTabel(data) {
             const tb = document.getElementById('tableBody'); 
             if(!tb) return;
@@ -1440,7 +1526,7 @@
                     if (resPelayanan.data) {
                         pelayananData = resPelayanan.data.map(p => {
                             const pat = patientsData.find(x => x.erm === p.erm) || {};
-                            return { ...p, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
+                            return { ...p, nama: pat.nama || p.nama, tanggalSistem: new Date(p.tanggalSistem), jk: pat.jk || '-', alamat: pat.alamat || '-', rt: pat.rt || '-', rw: pat.rw || '-', kel: pat.kel || '-', ttl: pat.ttl || '-', no_wa: pat.no_wa || '-', tglKontrol: p.tglKontrol || '', statusKontrol: p.statusKontrol || '-' };
                         });
                     }
                     
