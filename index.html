@@ -1671,8 +1671,7 @@
                 alamat: document.getElementById('form_alamat').value || '-',
                 rt: document.getElementById('form_rt').value || '-',
                 rw: document.getElementById('form_rw').value || '-',
-                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag,
-                created_at: editPasienIndex === -1 ? new Date().toISOString() : (patientsData[editPasienIndex].created_at || new Date().toISOString())
+                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag
             };
             
             let tglFormatted = dataObj.tglLahirRaw ? dataObj.tglLahirRaw.split('-').reverse().join('-') : '';
@@ -1776,11 +1775,11 @@
                 
                 let showTagBaru = false;
                 if (row.tag === 'Baru') {
-                    // Hitung total kunjungan / pendaftaran pasien di pelayanan
-                    const visitCount = pelayananData.filter(p => p.erm === row.erm).length;
+                    // Hitung berapa kali pasien ini sudah masuk ke antrean pelayanan
+                    const jumlahKunjungan = pelayananData.filter(p => p.erm === row.erm).length;
                     
-                    // Teks "BARU" hilang jika pasien sudah 2 kali periksa / berkunjung
-                    if (visitCount < 2) {
+                    // Jika kunjungan kurang dari 2, maka statusnya masih BARU
+                    if (jumlahKunjungan < 2) {
                         showTagBaru = true;
                     }
                 }
