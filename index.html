@@ -1671,7 +1671,8 @@
                 alamat: document.getElementById('form_alamat').value || '-',
                 rt: document.getElementById('form_rt').value || '-',
                 rw: document.getElementById('form_rw').value || '-',
-                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag
+                tag: editPasienIndex === -1 ? 'Baru' : patientsData[editPasienIndex].tag,
+                created_at: editPasienIndex === -1 ? new Date().toISOString() : (patientsData[editPasienIndex].created_at || new Date().toISOString())
             };
             
             let tglFormatted = dataObj.tglLahirRaw ? dataObj.tglLahirRaw.split('-').reverse().join('-') : '';
@@ -1772,8 +1773,20 @@
 
             filteredData.forEach((row, index) => {
                 const tr = document.createElement('tr'); tr.className = "hover:bg-teal-50/30 transition-colors";
+                
+                let showTagBaru = false;
+                if (row.tag === 'Baru') {
+                    // Hitung total kunjungan / pendaftaran pasien di pelayanan
+                    const visitCount = pelayananData.filter(p => p.erm === row.erm).length;
+                    
+                    // Teks "BARU" hilang jika pasien sudah 2 kali periksa / berkunjung
+                    if (visitCount < 2) {
+                        showTagBaru = true;
+                    }
+                }
+
                 let nm = `<span class="font-bold text-slate-700">${row.nama}</span>`;
-                if(row.tag==='Baru') nm += `<span class="ml-2 md:ml-3 bg-teal-100 text-teal-700 text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
+                if (showTagBaru) nm += `<span class="ml-2 md:ml-3 bg-teal-100 text-teal-700 text-[9px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-teal-200">Baru</span>`;
                 
                 let thn = "0";
                 if(row.tglLahirRaw) { const d=new Date(row.tglLahirRaw); thn = new Date().getFullYear() - d.getFullYear(); }
